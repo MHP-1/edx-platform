@@ -786,6 +786,22 @@ def student_dashboard(request):  # lint-amnesty, pylint: disable=too-many-statem
         if fbe_is_on:
             enrollments_fbe_is_on.append(course_key)
 
+    all_courses = course_entitlements + course_enrollments
+    search_query = request.GET.get("search_query", None)
+    if search_query:
+        enrollment_ids = [enrollment.id for enrollment in all_courses]
+        all_courses = CourseEnrollment.objects.filter(id__in=enrollment_ids, course__display_name__icontains=search_query)
+
+    running_courses = list()
+    completed_courses = list()
+    for course in all_courses:
+        try:
+            GeneratedCertificate.objects.get(user=request.user, course_id=course.course.id, status="downloadable")
+            completed_courses.append(course)
+        except Exception as e:
+            running_courses.append(course)
+
+
     context = {
         'urls': urls,
         'programs_data': programs_data,
@@ -795,7 +811,6 @@ def student_dashboard(request):  # lint-amnesty, pylint: disable=too-many-statem
         'redirect_message': Text(redirect_message),
         'account_activation_messages': account_activation_messages,
         'activate_account_message': activate_account_message,
-        'course_enrollments': course_enrollments,
         'course_entitlements': course_entitlements,
         'course_entitlement_available_sessions': course_entitlement_available_sessions,
         'unfulfilled_entitlement_pseudo_sessions': unfulfilled_entitlement_pseudo_sessions,
@@ -842,6 +857,10 @@ def student_dashboard(request):  # lint-amnesty, pylint: disable=too-many-statem
         'disable_unenrollment': disable_unenrollment,
         # TODO: clean when experiment(Merchandise 2U LOBs - Dashboard) would be stop. [VAN-1097]
         'is_enterprise_user': is_enterprise_learner(user),
+
+        'course_enrollments': running_courses,
+        'completed_courses': completed_courses,
+        'search_query': search_query,
     }
 
     # Include enterprise learner portal metadata and messaging

@@ -98,6 +98,20 @@ def has_course_started(start_date):
     return datetime.now(utc) > start_date
 
 
+# Added by Developer
+def has_enrollment_started(enrollment_date):
+    """
+    Given a course's start datetime, returns whether the current time's past it.
+
+    Arguments:
+        enrollment_date (datetime): The start datetime of the course in question.
+    """
+    # TODO: This will throw if enrollment_date is None... consider changing this behavior?
+    if enrollment_date:
+        return datetime.now(utc) > enrollment_date
+    return False
+
+
 def has_course_ended(end_date):
     """
     Given a course's end datetime, returns whether

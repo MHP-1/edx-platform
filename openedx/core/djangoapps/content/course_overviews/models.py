@@ -535,6 +535,13 @@ class CourseOverview(TimeStampedModel):
         """
         return course_metadata_utils.has_course_started(self.start)
 
+    # Added by Developer
+    def has_enrollment_started(self):
+        """
+        Returns whether the the course enrollment has started.
+        """
+        return course_metadata_utils.has_enrollment_started(self.enrollment_start)
+
     def has_ended(self):
         """
         Returns whether the course has ended.
