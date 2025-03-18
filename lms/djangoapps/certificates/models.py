@@ -236,6 +236,10 @@ class GeneratedCertificate(models.Model):
     download_url = models.CharField(max_length=128, blank=True, default='')
     error_reason = models.CharField(max_length=512, blank=True, default='')
 
+    # Added by developer
+    image_url = models.CharField(max_length=1024, blank=True, null=True)
+    share_image_url = models.CharField(max_length=1024, blank=True, null=True)
+
     # This is necessary because CMS does not install the certificates app, but it
     # imports this model's code. Simple History will attempt to connect to the installed
     # model in the certificates app, which will fail.
@@ -1357,3 +1361,21 @@ def handle_certificate_date_override_delete(sender, instance, **kwargs):    # py
     an object is not necessarily called when deleting objects in bulk.)
     """
     transaction.on_commit(instance.send_course_cert_changed_signal)
+
+
+@receiver(COURSE_CERT_AWARDED, sender=GeneratedCertificate)
+def generate_cert_pdf(sender, user, course_key, status, **kwargs):
+    """
+    Generated pdf file for awarded certificate
+    """
+    from .tasks import generate_course_cert_pdf
+    context = dict()
+    if status == "downloadable":
+        certificate = GeneratedCertificate.objects.get(
+            user=user, course_id=course_key, status=status
+        )
+        if not certificate.download_url:
+            try:
+                generate_course_cert_pdf(certificate.verify_uuid)
+            except Exception as e:
+                pass

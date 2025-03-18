@@ -164,3 +164,144 @@ def get_changed_cert_templates(options: Dict[str, Any]) -> List[CertificateTempl
     )
 
     return templates_changed
+
+
+def generate_course_cert_pdf(certificate_id):
+    """
+    Generate pdf for given template with given filename
+    """
+    certificate = GeneratedCertificate.objects.get(verify_uuid=certificate_id)
+    file_path = "{root_path}certificate/{filename}.pdf".format(
+        root_path=settings.MEDIA_ROOT, filename=certificate_id
+    )
+    cert_url = settings.LMS_ROOT_URL + reverse(
+        "certificates:render_pdf_cert_by_uuid",
+        kwargs={"certificate_uuid": certificate_id},
+    )
+    pdfkit_options = {
+        "dpi": 100,
+        "orientation": "Portrait",
+        "encoding": "UTF-8",
+        "margin-top": "3mm",
+        "margin-bottom": "3mm",
+        "margin-left": "2mm",
+        "margin-right": "2mm",
+        "page-width": "180mm",
+        "page-height": "131mm",
+        "zoom": 1,
+        "load-media-error-handling": "skip",
+    }
+    try:
+        pdfkit.from_url(cert_url, file_path, options=pdfkit_options)
+        logger.info("Certificate PDF generated successfully using cert_url")
+    except Exception as e:
+        logger.info("Failed to create pdf using cert_url. Error: {}".format(str(e)))
+        rep = {
+            "/static": str(settings.LMS_ROOT_URL) + "/static",
+            "/media": str(settings.LMS_ROOT_URL) + "/media",
+            "/asset-": str(settings.LMS_ROOT_URL) + "/asset-",
+        }
+        rep = dict((re.escape(k), v) for k, v in rep.items())
+        pattern = re.compile("|".join(rep.keys()))
+        context = {
+            "disable_header": True,
+            "disable_footer": True,
+            "disable_cookie_banner": True,
+            "disable_chat_link": True,
+            "certificate_data": {},
+            "organization_long_name": {},
+        }
+        platform_name = configuration_helpers.get_value(
+            "platform_name", settings.PLATFORM_NAME
+        )
+        configuration = CertificateHtmlViewConfiguration.get_config()
+        request = get_request_or_stub()
+        course = get_course_by_id(certificate.course_id)
+        active_configuration = get_active_web_certificate(course, None)
+        context["certificate_data"] = active_configuration
+        _update_context_with_basic_info(
+            context, six.text_type(certificate.course_id), platform_name, configuration
+        )
+        _update_organization_context(context, course)
+        _update_course_context(
+            request, context, course, certificate.course_id, platform_name
+        )
+        _update_context_with_user_info(request, context, certificate.user, certificate)
+        course = CourseManage.objects.get(course_id=certificate.course_id)
+
+        if course.certificate_template == "pg_course_certificate":
+            template = "certificates/pg_course_certificate_for_pdf.html"
+        elif course.certificate_template == "women_health_course_certificate":
+            template = "certificates/women_health_course_certificate_for_pdf.html"
+        else:
+            template = "certificates/certificate_for_pdf.html"
+
+        html_content = render_to_response(template, context)
+        content = pattern.sub(
+            lambda m: rep[re.escape(m.group(0))], html_content.content.decode("utf-8")
+        )
+        try:
+            pdfkit.from_string(content, file_path, options=pdfkit_options)
+            logger.info("Certificate PDF generated successfully")
+        except Exception as e:
+            logger.info("Failed to create pdf using content. Error: {}".format(str(e)))
+
+    certificate_url = "{lms_root}{media_url}certificate/{filename}.pdf".format(
+        lms_root=settings.LMS_ROOT_URL,
+        media_url=settings.MEDIA_URL,
+        filename=certificate_id,
+    )
+    generate_certificate_images(file_path, certificate_id)
+    certificate_image = "{lms_root}{media_url}certificate/{filename}.jpg".format(
+        lms_root=settings.LMS_ROOT_URL,
+        media_url=settings.MEDIA_URL,
+        filename=certificate_id,
+    )
+    share_image_url = "{lms_root}{media_url}certificate/{filename}_resized.jpeg".format(
+        lms_root=settings.LMS_ROOT_URL,
+        media_url=settings.MEDIA_URL,
+        filename=certificate_id,
+    )
+    certificate.download_url = certificate_url
+    certificate.image_url = certificate_image
+    certificate.share_image_url = share_image_url
+    certificate.save()
+    logger.info("Certificate path: {}".format(certificate_url))
+
+
+def generate_certificate_images(file_path, certificate_id):
+    """
+    Genereate share and certificate images for given data
+    """
+    try:
+        images = convert_from_path(file_path)
+        certificate_img_path = "{root_path}certificate/{filename}.jpg".format(
+            root_path=settings.MEDIA_ROOT, filename=certificate_id
+        )
+        for i in range(len(images)):
+            images[i].save(certificate_img_path, "JPEG")
+
+        resized_img_path = "{root_path}certificate/{filename}_resized.jpeg".format(
+            root_path=settings.MEDIA_ROOT, filename=certificate_id
+        )
+        image = Image.open(certificate_img_path)
+        new_img = image.resize((1076, 800))
+
+        right = 262
+        left = 262
+        top = 195
+        bottom = 195
+
+        width, height = new_img.size
+        new_width = width + right + left
+        new_height = height + top + bottom
+
+        resized_img = Image.new(new_img.mode, (new_width, new_height), (255, 255, 255))
+        resized_img.paste(new_img, (left, top))
+        resized_img.save(resized_img_path)
+    except Exception as e:
+        logger.info(
+            "Failed to create certificate image using cert_pdf. Error: {}".format(
+                str(e)
+            )
+        )
