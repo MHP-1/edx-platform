@@ -1003,7 +1003,7 @@ def course_about_with_slug(request, slug_id):
 
         registration_price, course_price = get_course_prices(course)  # lint-amnesty, pylint: disable=unused-variable
 
-        can_add_course_to_cart = _is_shopping_cart_enabled and registration_price and not ecommerce_checkout_link
+        can_add_course_to_cart = registration_price and not ecommerce_checkout_link
 
         # Used to provide context to message to student if enrollment not allowed
         can_enroll = bool(request.user.has_perm(ENROLL_IN_COURSE, course))
@@ -1031,6 +1031,10 @@ def course_about_with_slug(request, slug_id):
         if in_cart and cart.currency != currency:
             cart.delete()
             in_cart = False
+
+        reg_then_add_to_cart_link = "{reg_url}?course_id={course_id}&enrollment_action=add_to_cart".format(
+            reg_url=reverse('register_user'), course_id=(str(course_id))
+        )
         context = {
             'course': course,
             'course_details': course_details,
@@ -1063,6 +1067,7 @@ def course_about_with_slug(request, slug_id):
             'price': price,
             'can_add_course_to_cart': can_add_course_to_cart,
             'cart_link': reverse('shoppingcart:shoppingcart.views.show_cart'),
+            'reg_then_add_to_cart_link': reg_then_add_to_cart_link
         }
 
         course_about_template = 'courseware/course_about.html'

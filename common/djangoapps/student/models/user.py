@@ -557,6 +557,10 @@ class UserProfile(models.Model):
         message="Phone number must start with '+' (optional) followed by digits (0-9) only.",
     )
     phone_number = models.CharField(validators=[phone_regex], blank=True, null=True, max_length=50)
+    is_business_account = models.BooleanField(default=False)
+    organization_name = models.CharField(blank=True, null=True, max_length=3000)
+    business_entity = models.CharField(blank=True, null=True, max_length=3000, db_index=False)
+    postal_code = models.CharField(blank=True, null=True, max_length=3000, db_index=False)
 
     @property
     def has_profile_image(self):
