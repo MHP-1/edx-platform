@@ -559,10 +559,22 @@ def send_mail_to_student(student, param_dict, language=None):
     elif 'course' in param_dict:
         param_dict['course_name'] = param_dict['course'].display_name_with_default
 
-    param_dict['site_name'] = configuration_helpers.get_value(
-        'SITE_NAME',
-        param_dict['site_name']
-    )
+    # Added by developer
+    try:
+        user = User.objects.get(email=student)
+        routed_full_name = user.profile.name or user.get_full_name() or user.username
+    except Exception as e:
+        routed_full_name = student 
+
+    param_dict.update({
+        'site_name': configuration_helpers.get_value('LMS_ROOT_URL', settings.LMS_ROOT_URL),
+        'routed_full_name': routed_full_name,
+        'support_url': configuration_helpers.get_value(
+            'ACTIVATION_EMAIL_SUPPORT_LINK', settings.ACTIVATION_EMAIL_SUPPORT_LINK
+        ) or settings.SUPPORT_SITE_LINK,
+        'support_email': configuration_helpers.get_value('CONTACT_EMAIL', settings.CONTACT_EMAIL),
+    })
+
 
     # Extract an LMS user ID for the student, if possible.
     # ACE needs the user ID to be able to send email via Braze.

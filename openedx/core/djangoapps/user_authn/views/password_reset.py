@@ -125,9 +125,15 @@ def send_password_reset_success_email(user, request):
     """
     message_context, user_language_preference = get_user_default_email_params(user)
     lms_root_url = configuration_helpers.get_value('LMS_ROOT_URL', settings.LMS_ROOT_URL)
-    message_context.update(
-        {'login_link': f'{lms_root_url}/login', 'request': request, }
-    )
+    # Updated by developer
+    message_context.update({
+        'login_link': f'{lms_root_url}/login', 'request': request,
+        'request': request, 
+        'routed_full_name': user.profile.name or user.get_full_name() or user.username,
+        'site_name': configuration_helpers.get_value('LMS_ROOT_URL', settings.LMS_ROOT_URL),
+        'support_url': "{}/faqs".format(configuration_helpers.get_value('LMS_ROOT_URL', settings.LMS_ROOT_URL)),
+        'support_email': configuration_helpers.get_value('CONTACT_EMAIL', settings.CONTACT_EMAIL),
+    })
 
     msg = PasswordResetSuccess(context=message_context).personalize(
         recipient=Recipient(user.id, user.email),
@@ -152,6 +158,7 @@ def send_password_reset_email_for_user(user, request, preferred_email=None):
     message_context, user_language_preference = get_user_default_email_params(user)
     site_name = settings.AUTHN_MICROFRONTEND_DOMAIN if should_redirect_to_authn_microfrontend() \
         else configuration_helpers.get_value('SITE_NAME', settings.SITE_NAME)
+    # Updated by developer
     message_context.update({
         'request': request,  # Used by google_analytics_tracking_pixel
         # TODO: This overrides `platform_name` from `get_base_template_context` to make the tests passes
@@ -163,7 +170,11 @@ def send_password_reset_email_for_user(user, request, preferred_email=None):
                 'uidb36': int_to_base36(user.id),
                 'token': default_token_generator.make_token(user),
             }),
-        )
+        ),
+        'site_name': configuration_helpers.get_value('LMS_ROOT_URL', settings.LMS_ROOT_URL),
+        'routed_full_name': user.profile.name or user.get_full_name() or user.username,
+        'support_url': "{}/faqs".format(configuration_helpers.get_value('LMS_ROOT_URL', settings.LMS_ROOT_URL)),
+        'support_email': configuration_helpers.get_value('CONTACT_EMAIL', settings.CONTACT_EMAIL),
     })
 
     msg = PasswordReset().personalize(

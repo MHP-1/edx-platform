@@ -797,6 +797,12 @@ def do_email_change_request(user, new_email, activation_key=None, secondary_emai
             site=configuration_helpers.get_value('SITE_NAME', settings.SITE_NAME),
             link=confirm_link,
         ),
+        'site_name': configuration_helpers.get_value('LMS_ROOT_URL', settings.LMS_ROOT_URL),
+        'routed_full_name': user.profile.name or user.get_full_name() or user.username,
+        'support_url': configuration_helpers.get_value(
+            'ACTIVATION_EMAIL_SUPPORT_LINK', settings.ACTIVATION_EMAIL_SUPPORT_LINK
+        ) or settings.SUPPORT_SITE_LINK,
+        'support_email': configuration_helpers.get_value('CONTACT_EMAIL', settings.CONTACT_EMAIL),
     })
 
     if secondary_email_change_request:
