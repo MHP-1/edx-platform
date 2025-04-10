@@ -2,7 +2,7 @@
 
 
 from functools import wraps
-
+from openpyxl import Workbook #Added by developer
 from config_models.admin import ConfigurationModelAdmin
 from django import forms
 from django.conf import settings
@@ -344,20 +344,111 @@ class UserChangeForm(BaseUserChangeForm):
             )
 
 
+#Updated by developer
 class UserAdmin(BaseUserAdmin):
-    """ Admin interface for the User model. """
+    """Admin interface for the User model."""
+
     inlines = (UserProfileInline, AccountRecoveryInline)
     form = UserChangeForm
+    list_filter = (
+        "is_active",
+        "is_staff",
+        "is_superuser",
+        "profile__is_business_account",
+    )
+    list_display = [
+        "username",
+        "email",
+        "get_profile_name",
+        "get_mobile_number",
+        "last_login",
+        "date_joined",
+        "is_active",
+    ]
+    actions = ("export_as_xlsx",)
 
     def get_readonly_fields(self, request, obj=None):
         """
         Allows editing the users while skipping the username check, so we can have Unicode username with no problems.
-        The username is marked read-only when editing existing users regardless of `ENABLE_UNICODE_USERNAME`, to simplify the bokchoy tests.  # lint-amnesty, pylint: disable=line-too-long
+        The username is marked read-only when editing existing users regardless of `ENABLE_UNICODE_USERNAME`, to simplify the bokchoy tests.
         """
-        django_readonly = super().get_readonly_fields(request, obj)
+        django_readonly = super(UserAdmin, self).get_readonly_fields(request, obj)
         if obj:
-            return django_readonly + ('username',)
+            return django_readonly + ("username",)
         return django_readonly
+
+    def get_mobile_number(self, instance):
+        try:
+            mobile_number = instance.profile.phone_number
+        except Exception as e:
+            mobile_number = "-"
+        return mobile_number
+
+    get_mobile_number.short_description = _("Mobile Number")
+
+    def get_profile_name(self, instance):
+        try:
+            profile_name = instance.profile.name or instance.get_full_name()
+        except Exception as e:
+            profile_name = instance.get_full_name()
+        return profile_name
+
+    get_profile_name.short_description = _("Profile Name")
+
+    def export_as_xlsx(self, request, queryset):
+        field_names = [
+            "Username",
+            "Email",
+            "Full Name",
+            "Mobile No.",
+            "Gender",
+            "Country",
+            "Postal/Zip Code",
+            "Last Login",
+            "Date Joined",
+            "Is Active",
+        ]
+        # Create an Excel workbook and sheet
+        workbook = Workbook()
+        sheet = workbook.active
+        sheet.title = "Users"
+
+        # Write the header row
+        sheet.append(field_names)
+
+        for obj in queryset:
+            try:
+                data = [
+                    obj.username,
+                    obj.email,
+                    obj.profile.name or obj.get_full_name(),
+                    obj.profile.phone_number,
+                    obj.profile.gender_display,
+                    obj.profile.country.name,
+                    obj.profile.postal_code or "",
+                    (
+                        obj.last_login.strftime("%b %d, %Y, %I:%M %p")
+                        if obj.last_login
+                        else ""
+                    ),
+                    obj.date_joined.strftime("%b %d, %Y, %I:%M %p"),
+                    "Yes" if obj.is_active else "No",
+                ]
+                sheet.append(data)
+            except Exception as e:
+                continue
+
+        # Create the HttpResponse for the XLSX file
+        response = HttpResponse(
+            content_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+        )
+        response["Content-Disposition"] = 'attachment; filename="Users Report.xlsx"'
+
+        # Save the workbook to the response
+        workbook.save(response)
+        return response
+
+    export_as_xlsx.short_description = "Export selected orders as XLSX"
 
 
 @admin.register(UserAttribute)

@@ -35,6 +35,19 @@ function(ValidatingView, CodeMirror, _, $, ui, DateUtils, FileUploadModel,
             this.$el.find('#course-name').val(this.model.get('run'));
             this.$el.find('.set-date').datepicker({dateFormat: 'm/d/yy'});
             this.$el.find('#certificates-display-behavior').val(this.model.get('certificates_display_behavior'));
+            // Added by developer
+            this.$el.find('#course_category').val(this.model.get('course_category'));
+            this.$el.find('#subject').val(this.model.get('subject'));
+            this.$el.find('#difficulty').val(this.model.get('difficulty'));
+            this.$el.find('#duration').val(this.model.get('duration'));
+            this.$el.find('#certificate_duration').val(this.model.get('certificate_duration'));
+            this.$el.find('#subscription_enabled').val(this.model.get('subscription_enabled'));
+            this.$el.find('#metadata_title').val(this.model.get('metadata_title'));
+            this.$el.find('#course_slug_data').val(this.model.get('course_slug_data'));
+            this.$el.find('#certificate_type').val(this.model.get('certificate_type'));
+            this.$el.find('#passing_progress').val(this.model.get('passing_progress'));
+            this.$el.find('#metadata_description').val(this.model.get('metadata_description'));
+
             this.updateCertificatesDisplayBehavior();
 
             // Avoid showing broken image on mistyped/nonexistent image
@@ -86,6 +99,7 @@ function(ValidatingView, CodeMirror, _, $, ui, DateUtils, FileUploadModel,
             DateUtils.setupDatePicker('enrollment_start', this);
             DateUtils.setupDatePicker('enrollment_end', this);
             DateUtils.setupDatePicker('upgrade_deadline', this);
+            DateUtils.setupDatePicker('coming_soon_date', this);
 
             this.$el.find('#' + this.fieldToSelectorMap.overview).val(this.model.get('overview'));
             this.codeMirrorize(null, $('#course-overview')[0]);
@@ -159,6 +173,24 @@ function(ValidatingView, CodeMirror, _, $, ui, DateUtils, FileUploadModel,
             this.learning_info_view.render();
             this.instructor_info_view.render();
 
+            // Added by developer
+            this.$el.find('#' + this.fieldToSelectorMap['course_category']).val(this.model.get('course_category'));
+            this.$el.find('#' + this.fieldToSelectorMap['subject']).val(this.model.get('subject'));
+            this.$el.find('#' + this.fieldToSelectorMap['difficulty']).val(this.model.get('difficulty'));
+            this.$el.find('#' + this.fieldToSelectorMap['duration']).val(this.model.get('duration'));
+            this.$el.find('#' + this.fieldToSelectorMap['certificate_duration']).val(this.model.get('certificate_duration'));
+            this.$el.find('#' + this.fieldToSelectorMap['subscription_enabled']).val(this.model.get('subscription_enabled'));
+            this.$el.find('#' + this.fieldToSelectorMap['metadata_title']).val(this.model.get('metadata_title'));
+            this.$el.find('#' + this.fieldToSelectorMap['course_slug_data']).val(this.model.get('course_slug_data'));
+            this.$el.find('#' + this.fieldToSelectorMap['certificate_type']).val(this.model.get('certificate_type'));
+            this.$el.find('#' + this.fieldToSelectorMap['passing_progress']).val(this.model.get('passing_progress'));
+            this.$el.find('#' + this.fieldToSelectorMap['metadata_description']).val(this.model.get('metadata_description'));
+            if (this.model.get('subscription_enabled') == 'true') {
+               this.$('#' + this.fieldToSelectorMap.subscription_enabled).attr('checked', this.model.get('subscription_enabled'));
+            } else {
+               this.$('#' + this.fieldToSelectorMap.subscription_enabled).removeAttr('checked');
+            }
+
             return this;
         },
         fieldToSelectorMap: {
@@ -188,7 +220,20 @@ function(ValidatingView, CodeMirror, _, $, ui, DateUtils, FileUploadModel,
             course_settings_learning_fields: 'course-settings-learning-fields',
             add_course_learning_info: 'add-course-learning-info',
             add_course_instructor_info: 'add-course-instructor-info',
-            course_learning_info: 'course-learning-info'
+            course_learning_info: 'course-learning-info',
+            // Added by developer
+            course_category: 'course_category',
+            subject: 'subject',
+            difficulty: 'difficulty',
+            duration: 'duration',
+            certificate_duration: 'certificate_duration',
+            subscription_enabled: 'subscription_enabled',
+            metadata_title: 'metadata_title',
+            course_slug_data: 'course_slug_data',
+            certificate_type: 'certificate_type',
+            passing_progress: 'passing_progress',
+            metadata_description: 'metadata_description',
+            coming_soon_date: 'coming-soon'
         },
 
         addLearningFields: function() {
@@ -317,6 +362,17 @@ function(ValidatingView, CodeMirror, _, $, ui, DateUtils, FileUploadModel,
             case 'course-subtitle':
             case 'course-duration':
             case 'course-description':
+            case 'course_category':
+            case 'subject':
+            case 'difficulty':
+            case 'duration':
+            case 'certificate_duration':
+            case 'metadata_title':
+            case 'course_slug_data':
+            case 'certificate_type':
+            case 'passing_progress':
+            case 'metadata_description':
+            case 'subscription_enabled':
             case 'course-short-description':
                 this.setField(event);
                 break;

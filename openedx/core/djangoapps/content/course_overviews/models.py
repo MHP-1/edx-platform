@@ -273,6 +273,36 @@ class CourseOverview(TimeStampedModel):
 
         course_overview.force_on_flexible_peer_openassessments = course.force_on_flexible_peer_openassessments
 
+        # Added by developer
+        category = CourseDetails.fetch_about_attribute(course.id, 'course_category')
+        subject = CourseDetails.fetch_about_attribute(course.id, 'subject')
+        difficulty = CourseDetails.fetch_about_attribute(course.id, 'difficulty')
+        duration = CourseDetails.fetch_about_attribute(course.id, 'duration')
+        certificate_duration = CourseDetails.fetch_about_attribute(course.id, 'certificate_duration')
+        subscription_enabled = CourseDetails.fetch_about_attribute(course.id, 'subscription_enabled')
+        metadata_title = CourseDetails.fetch_about_attribute(course.id, 'metadata_title')
+        metadata_description = CourseDetails.fetch_about_attribute(course.id, 'metadata_description')
+        course_slug_data = CourseDetails.fetch_about_attribute(course.id, 'course_slug_data')
+        certificate_type = CourseDetails.fetch_about_attribute(course.id, 'certificate_type')
+        passing_progress = CourseDetails.fetch_about_attribute(course.id, 'passing_progress')
+        subscription_enabled = True if subscription_enabled == 'true' else False
+        data = {
+            'category': category,
+            'subject': subject,
+            'difficulty': difficulty,
+            'duration': duration,
+            'certificate_duration': certificate_duration,
+            'subscription_enabled': subscription_enabled,
+            'metadata_title': metadata_title,
+            'metadata_description': metadata_description,
+            'display_name': course_slug_data or display_name,
+            'coming_soon_date': course.coming_soon_date,
+            'certificate_type': certificate_type,
+            'passing_progress': passing_progress
+        }
+        from course_manage.models import CourseManage
+        CourseManage.create_or_update(course.id, data)
+
         if not CatalogIntegration.is_enabled():
             course_overview.language = course.language
 

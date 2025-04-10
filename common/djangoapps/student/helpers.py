@@ -664,7 +664,7 @@ def process_survey_link(survey_link, user):
     return survey_link.format(UNIQUE_ID=unique_id_for_user(user))
 
 
-def do_create_account(form, custom_form=None):
+def do_create_account(form, custom_form=None, request=None):
     """
     Given cleaned post variables, create the User and UserProfile objects, as well as the
     registration for this user.
@@ -733,7 +733,7 @@ def do_create_account(form, custom_form=None):
 
     profile_fields = [
         "name", "level_of_education", "gender", "mailing_address", "city", "country", "goals",
-        "year_of_birth"
+        "year_of_birth", "phone_number", "postal_code" #updated by developer
     ]
     profile = UserProfile(
         user=user,
@@ -748,6 +748,15 @@ def do_create_account(form, custom_form=None):
         log.exception(f"UserProfile creation failed for user {user.id}.")
         raise
 
+    #Added by Developer
+    if request and request.session.get('referral_code', None):
+        headers = {"x-api-key": settings.FIRSTPROMOTER_API_KEY}
+        api_endpoint = "https://firstpromoter.com/api/v1/track/signup"
+        payload = "email={email}&ref_id={ref_id}".format(email=user.email,ref_id=request.session.get('referral_code'))
+        response = requests.request("POST", api_endpoint, data=payload, headers=headers)
+        if response.status_code != 200:
+            log.info("Failed to call firstpromoter lead api. Response:{}".format(response.json()))
+        del request.session['referral_code']
     return user, profile, registration
 
 

@@ -82,6 +82,18 @@ class CourseMetadata:
         'is_onboarding_exam',
         'discussions_settings',
         'copied_from_block',
+        # Added by developer
+        'course_category',
+        'subject',
+        'difficulty',
+        'duration',
+        'subscription_enabled',
+        'certificate_duration',
+        'metadata_title',
+        'metadata_description',
+        'course_slug_data',
+        'certificate_type',
+        'passing_progress',
     ]
 
     @classmethod

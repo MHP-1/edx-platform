@@ -73,6 +73,7 @@
                     institution_login: null,
                     hinted_login: null
                 };
+                this.country_code = options.country_code;   // Added by developer
                 this.platformName = options.platform_name;
                 this.supportURL = options.support_link;
                 this.passwordResetSupportUrl = options.password_reset_support_link;
@@ -215,7 +216,8 @@
                         hideAuthWarnings: this.hideAuthWarnings,
                         is_require_third_party_auth_enabled: this.is_require_third_party_auth_enabled,
                         enableCoppaCompliance: this.enable_coppa_compliance,
-                        showRegisterLinks: this.showRegisterLinks
+                        showRegisterLinks: this.showRegisterLinks,
+                        country_code: this.country_code // Added by developer
                     });
 
                     // Listen for 'auth-complete' event so we can enroll/redirect the user appropriately.

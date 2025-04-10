@@ -95,13 +95,15 @@ class InvalidFieldError(Exception):
 class FormDescription:
     """Generate a JSON representation of a form. """
 
-    ALLOWED_TYPES = ["text", "email", "select", "textarea", "checkbox", "plaintext", "password", "hidden"]
+    # updated by developer
+    ALLOWED_TYPES = ["text", "email", "select", "textarea", "checkbox", "plaintext", "password", "hidden", "number"]
 
     ALLOWED_RESTRICTIONS = {
         "text": ["min_length", "max_length"],
         "password": ["min_length", "max_length", "min_upper", "min_lower",
                      "min_punctuation", "min_symbol", "min_numeric", "min_alphabetic"],
         "email": ["min_length", "max_length", "readonly"],
+        "number": ["min_length", "max_length"],
     }
 
     FIELD_TYPE_MAP = {
@@ -112,6 +114,7 @@ class FormDescription:
         forms.Textarea: "textarea",
         forms.BooleanField: "checkbox",
         forms.EmailField: "email",
+        forms.IntegerField: "number",
     }
 
     OVERRIDE_FIELD_PROPERTIES = [

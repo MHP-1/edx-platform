@@ -1187,6 +1187,17 @@ def settings_handler(request, course_key_string):  # lint-amnesty, pylint: disab
             if use_new_schedule_details_page(course_key):
                 return redirect(get_schedule_details_url(course_key))
             settings_context = get_course_settings(request, course_key, course_block)
+
+            # Added by developer
+            from common.djangoapps.student.models import CourseEnrollment
+            from course_manage.models import Category, Subject, Difficutly
+            enrollments = CourseEnrollment.objects.filter(course__id=course_key)
+            settings_context.update({
+                'categories': Category.objects.all(),
+                'subjects': Subject.objects.all(),
+                'difficulty_levels': Difficutly.objects.all(),
+                'enrollments': enrollments
+            })
             return render_to_response('settings.html', settings_context)
         elif 'application/json' in request.META.get('HTTP_ACCEPT', ''):  # pylint: disable=too-many-nested-blocks
             if request.method == 'GET':

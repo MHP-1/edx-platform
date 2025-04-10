@@ -234,9 +234,19 @@ def login_and_registration_form(request, initial_mode="login"):
         } for message in messages.get_messages(request) if 'account-recovery' in message.tags
     ]
 
+    # Added by developer
+    country_code = request.session.get('country_code', "IN")
+    country_code = country_code.lower() or "in"
+    # Otherwise, render the combined login/registration page
+    params_data = request.GET.dict()
+    if "ref" in params_data or "fp_ref" in params_data:
+        referral_code = params_data.get("ref") or params_data.get("fp_ref")
+        request.session['referral_code'] = referral_code
+
     # Otherwise, render the combined login/registration page
     context = {
         'data': {
+            'country_code': country_code,
             'login_redirect_url': redirect_to,
             'initial_mode': initial_mode,
             'third_party_auth': third_party_auth_context(request, redirect_to, third_party_auth_hint),

@@ -106,7 +106,7 @@ def validate_name(name):
         name (unicode): The name to validate.
     """
     if contains_html(name):
-        raise forms.ValidationError(_('Full Name cannot contain the following characters: < >'))
+        raise forms.ValidationError(_('Name cannot contain the following characters: < >'))
     if contains_url(name):
         raise forms.ValidationError(_('Enter a valid name'))
 
@@ -199,7 +199,8 @@ class AccountCreationForm(forms.Form):
             "mailing_address": _("Your mailing address is required"),
             "goals": _("A description of your goals is required"),
             "city": _("A city is required"),
-            "country": _("A country is required")
+            "country": _("A country is required"),
+            "postal_code": _("Postal code is required") # Added by Developer
         }
         for field_name, field_value in extra_fields.items():
             if field_name not in self.fields:
@@ -325,8 +326,8 @@ class RegistrationFormFactory:
     """
     Construct Registration forms and associated fields.
     """
-
-    DEFAULT_FIELDS = ["email", "name", "username", "password"]
+    # Updated by Developer
+    DEFAULT_FIELDS = ["email", "phone_number", "name", "username", "password"]
 
     def _is_field_visible(self, field_name):
         """Check whether a field is visible based on Django settings. """
@@ -342,6 +343,7 @@ class RegistrationFormFactory:
 
     def __init__(self):
 
+        # Updated by Developer
         self.EXTRA_FIELDS = [
             "confirm_email",
             "first_name",
@@ -349,6 +351,7 @@ class RegistrationFormFactory:
             "city",
             "state",
             "country",
+            "postal_code",
             "gender",
             "year_of_birth",
             "level_of_education",
@@ -361,7 +364,6 @@ class RegistrationFormFactory:
             "terms_of_service",
             "profession",
             "specialty",
-            "marketing_emails_opt_in",
         ]
 
         if settings.ENABLE_COPPA_COMPLIANCE and 'year_of_birth' in self.EXTRA_FIELDS:
@@ -549,7 +551,7 @@ class RegistrationFormFactory:
         """
         # Translators: This label appears above a field on the registration form
         # meant to hold the user's full name.
-        name_label = _("Full Name")
+        name_label = _("Name")
 
         # Translators: These instructions appear on the registration form, immediately
         # below a field meant to hold the user's full name.
@@ -574,7 +576,7 @@ class RegistrationFormFactory:
         """
         # Translators: This label appears above a field on the registration form
         # meant to hold the user's public username.
-        username_label = _("Public Username")
+        username_label = _("Username")
 
         username_instructions = _(
             # Translators: These instructions appear on the registration form, immediately
@@ -991,6 +993,52 @@ class RegistrationFormFactory:
                 "required": error_msg
             }
         )
+
+    # Added by Developer
+    def _add_phone_number_field(self, form_desc, required=True):
+        """Add a contact field to a form description.
+
+        Arguments:
+            form_desc: A form description
+
+        Keyword Arguments:
+            required (bool): Whether this field is required; defaults to True
+
+        """
+        mobile_label = _(u"Mobile Number")
+
+        form_desc.add_field(
+            "phone_number",
+            label=mobile_label,
+            field_type="number",
+            restrictions={
+                "min_length": 7,
+                "max_length": 17,
+            },
+            required=required
+        )
+
+
+    # Added by Developer
+    def _add_postal_code_field(self, form_desc, required=True):
+        """Add a postal_code field to a form description.
+
+        Arguments:
+            form_desc: A form description
+
+        Keyword Arguments:
+            required (bool): Whether this field is required; defaults to True
+
+        """
+        postal_code_label = _(u"PIN Code/ZIP/Postcode")
+
+
+        form_desc.add_field(
+            "postal_code",
+            label=postal_code_label,
+            required=required
+        )
+
 
     def _add_honor_code_field(self, form_desc, required=True):
         """Add an honor code field to a form description.

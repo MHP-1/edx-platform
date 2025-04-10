@@ -1061,7 +1061,74 @@ class CourseFields:  # lint-amnesty, pylint: disable=missing-class-docstring
         ),
         scope=Scope.settings
     )
-
+    # Added by developer
+    course_category = String(
+        display_name=_("Course Category"),
+        help=_("Select one of the Category for the course."),
+        default='',
+        scope=Scope.settings
+    )
+    subject = String(
+        display_name=_("Course Subject"),
+        help=_("Select one of the Subject for the course."),
+        default='',
+        scope=Scope.settings
+    )
+    difficulty = String(
+        display_name=_("Course Difficulty"),
+        help=_("Select one of the Difficulty for the course."),
+        default='',
+        scope=Scope.settings
+    )
+    duration = String(
+        display_name=_("Course Duration"),
+        help=_("Select one of the duration for the course."),
+        default='',
+        scope=Scope.settings
+    )
+    subscription_enabled = String(
+        display_name=_("Subscription Enabled"),
+        help=_("Enable subscription for the course."),
+        default='',
+        scope=Scope.settings
+    )
+    certificate_duration = String(
+        display_name=_("Course Certificagte Duration"),
+        help=_("Select one of the duration for the course."),
+        default='',
+        scope=Scope.settings
+    )
+    metadata_title = String(
+        display_name=_("Course Metadata title"),
+        help=_("Add Course Metadata title."),
+        default='',
+        scope=Scope.settings
+    )
+    metadata_description = String(
+        display_name=_("Course Metadata description"),
+        help=_("Add Course Metadata description."),
+        default='',
+        scope=Scope.settings
+    )
+    course_slug_data = String(
+        display_name=_("Course Slug"),
+        help=_("Add Course Slug."),
+        default='',
+        scope=Scope.settings
+    )
+    certificate_type = String(
+        display_name=_("Certificate Type"),
+        help=_("Select Certificate Type."),
+        default='',
+        scope=Scope.settings
+    )
+    passing_progress = String(
+        display_name=_("Passing Progress"),
+        help=_("Add Passing Progress."),
+        default='',
+        scope=Scope.settings
+    )
+    coming_soon_date = Date(help=_("Course coming soon date"), scope=Scope.settings)
 
 class CourseBlock(
     CourseFields,

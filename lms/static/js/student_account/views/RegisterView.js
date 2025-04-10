@@ -66,9 +66,12 @@
                 this.registerFormSubmitButtonText = data.thirdPartyAuth.registerFormSubmitButtonText || _('Create Account');
                 this.is_require_third_party_auth_enabled = data.is_require_third_party_auth_enabled;
                 this.enableCoppaCompliance = data.enableCoppaCompliance;
-
                 this.listenTo(this.model, 'sync', this.saveSuccess);
                 this.listenTo(this.model, 'validation', this.renderLiveValidations);
+
+                // Added by developer
+                this.phoneInput = ""
+                this.country_code = data.country_code
             },
 
             renderFields: function(fields, className) {
@@ -182,6 +185,16 @@
                     this.submitForm();
                 }
 
+                // Added by developer
+                const phoneInputField = document.querySelector("#register-phone_number");
+                this.phoneInput = window.intlTelInput(phoneInputField, {
+                    separateDialCode: true,
+                    preferredCountries: [this.country_code],
+                    utilsScript:
+                        "https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.8/js/utils.js",
+                });
+                $("#register-country").val(this.country_code.toUpperCase());
+                $('#register-country').prop('disabled', true);
                 return this;
             },
 
@@ -562,7 +575,8 @@
                     }
                     obj.confirm_email = $confirmEmail.val();
                 }
-
+                // added by developer
+                obj.phone_number = this.phoneInput.getNumber()
                 return obj;
             },
 

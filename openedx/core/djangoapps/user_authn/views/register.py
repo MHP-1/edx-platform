@@ -212,7 +212,7 @@ def create_account_with_params(request, params):  # pylint: disable=too-many-sta
     # Perform operations within a transaction that are critical to account creation
     with outer_atomic():
         # first, create the account
-        (user, profile, registration) = do_create_account(form, custom_form)
+        (user, profile, registration) = do_create_account(form, custom_form, request)  # Updated by developer
 
         third_party_provider, running_pipeline = _link_user_to_third_party_provider(
             is_third_party_auth_enabled, third_party_auth_credentials_in_api, user, request, params,

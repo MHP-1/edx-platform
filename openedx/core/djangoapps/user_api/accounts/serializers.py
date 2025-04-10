@@ -180,6 +180,8 @@ class UserReadOnlySerializer(serializers.Serializer):  # lint-amnesty, pylint: d
             "phone_number": None,
             "pending_name_change": None,
             "verified_name": None,
+            "phone_number": None, #Added by developer
+            "postal_code": "" #Added by developer
         }
 
         if user_profile:
@@ -208,7 +210,8 @@ class UserReadOnlySerializer(serializers.Serializer):  # lint-amnesty, pylint: d
                         user_profile.social_links.all().order_by('platform'), many=True
                     ).data,
                     "extended_profile": get_extended_profile(user_profile),
-                    "phone_number": user_profile.phone_number,
+                    "phone_number": user_profile.phone_number, #Added by developer
+                    "postal_code": user_profile.postal_code #Added by developer
                 }
             )
 
@@ -298,7 +301,7 @@ class AccountLegacyProfileSerializer(serializers.HyperlinkedModelSerializer, Rea
         fields = (
             "name", "gender", "goals", "year_of_birth", "level_of_education", "country", "state", "social_links",
             "mailing_address", "bio", "profile_image", "requires_parental_consent", "language_proficiencies",
-            "phone_number", "city"
+            "phone_number", "city", "postal_code" #Added by developer
         )
         # Currently no read-only field, but keep this so view code doesn't need to know.
         read_only_fields = ()

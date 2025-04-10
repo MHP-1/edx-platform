@@ -31,6 +31,17 @@ ABOUT_ATTRIBUTES = [
     'entrance_exam_id',
     'entrance_exam_minimum_score_pct',
     'about_sidebar_html',
+    # Added by developer
+    'course_category',
+    'subject',
+    'difficulty',
+    'subscription_enabled',
+    'certificate_duration',
+    'metadata_title',
+    'metadata_description',
+    'course_slug_data',
+    'certificate_type',
+    'passing_progress',
 ]
 
 
@@ -78,6 +89,18 @@ class CourseDetails:
         self.self_paced = None
         self.learning_info = []
         self.instructor_info = []
+        # Added by developer
+        self.course_category = ""
+        self.subject = ""
+        self.difficulty = ""
+        self.subscription_enabled = ""
+        self.certificate_duration = ""
+        self.metadata_title = ""
+        self.metadata_description = ""
+        self.course_slug_data = ""
+        self.certificate_type = ""
+        self.passing_progress = ""
+        self.coming_soon_date = None
 
     @classmethod
     def fetch_about_attribute(cls, course_key, attribute):
@@ -130,6 +153,19 @@ class CourseDetails:
         course_details.self_paced = block.self_paced
         course_details.learning_info = block.learning_info
         course_details.instructor_info = block.instructor_info
+        # Added by developer
+        course_details.course_category = block.course_category
+        course_details.subject = block.subject
+        course_details.difficulty = block.difficulty
+        course_details.duration = block.duration
+        course_details.subscription_enabled = block.subscription_enabled
+        course_details.certificate_duration = block.certificate_duration
+        course_details.metadata_title = block.metadata_title
+        course_details.metadata_description = block.metadata_description
+        course_details.course_slug_data = block.course_slug_data
+        course_details.coming_soon_date = getattr(block, 'coming_soon_date', None)
+        course_details.certificate_type = block.certificate_type
+        course_details.passing_progress = block.passing_progress
 
         # Default course license is "All Rights Reserved"
         course_details.license = getattr(block, "license", "all-rights-reserved")
@@ -245,6 +281,16 @@ class CourseDetails:
         if converted != block.enrollment_end:
             dirty = True
             block.enrollment_end = converted
+
+        # Added by developer
+        if 'coming_soon_date' in jsondict:
+            converted = date.from_json(jsondict['coming_soon_date'])
+        else:
+            converted = None
+
+        if converted != block.coming_soon_date:
+            dirty = True
+            block.coming_soon_date = converted
 
         if 'certificate_available_date' in jsondict:
             converted = date.from_json(jsondict['certificate_available_date'])
