@@ -5,7 +5,8 @@ Serializers for Course Blocks related return objects.
 from django.conf import settings
 from rest_framework import serializers
 from rest_framework.reverse import reverse
-
+from opaque_keys.edx.keys import UsageKey, CourseKey
+from xmodule.modulestore.django import modulestore
 from lms.djangoapps.course_blocks.transformers.visibility import VisibilityTransformer
 from openedx.core.djangoapps.discussions.transformers import DiscussionsTopicLinkTransformer
 
@@ -199,7 +200,65 @@ class BlockSerializer(serializers.Serializer):  # pylint: disable=abstract-metho
                     del cleaned_data[field]
             data = cleaned_data
 
+        # Added by developer
+        if data.get('type', '') == 'vimeo':
+            data['vimeo_url'] = self.get_vimeo_web_url(data)
+
+        if data.get('type', '') == 'pdf':
+            data['pdf_web_url'] = self.get_pdf_web_url(data)
+
+        if data.get('type', '') == 'audio':
+            data['audio_web_url'] = self.get_audio_web_url(data)
+
+        if data.get('type', '') == 'google-document':
+            data['google_document_web_url'] = self.get_google_document_web_url(data)
+
         return data
+
+
+    # Added by developer
+    def get_vimeo_web_url(self, data):
+        block_id = data.get('id')
+        try:
+            location = UsageKey.from_string(block_id)
+        except InvalidKeyError:
+            return None
+        item = modulestore().get_item(location)
+        vimeo_url = getattr(item, 'href', None)
+        return vimeo_url
+
+    def get_pdf_web_url(self, data):
+        block_id = data.get('id')
+        try:
+            location = UsageKey.from_string(block_id)
+        except InvalidKeyError:
+            return None
+        item = modulestore().get_item(location)
+        pdf_url = getattr(item, 'url', '')
+        if pdf_url.startswith('/asset'):
+            pdf_url = settings.LMS_ROOT_URL + pdf_url
+        return pdf_url
+
+    def get_audio_web_url(self, data):
+        block_id = data.get('id')
+        try:
+            location = UsageKey.from_string(block_id)
+        except InvalidKeyError:
+            return None
+        item = modulestore().get_item(location)
+        audio_url = getattr(item, 'src', None)
+        if audio_url.startswith('/asset'):
+            audio_url = settings.LMS_ROOT_URL + audio_url
+        return audio_url
+
+    def get_google_document_web_url(self, data):
+        block_id = data.get('id')
+        try:
+            location = UsageKey.from_string(block_id)
+        except InvalidKeyError:
+            return None
+        item = modulestore().get_item(location)
+        return getattr(item, 'embed_code', None).replace("\n", "")
 
 
 class BlockDictSerializer(serializers.Serializer):  # pylint: disable=abstract-method
