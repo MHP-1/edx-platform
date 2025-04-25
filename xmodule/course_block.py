@@ -547,6 +547,7 @@ class CourseFields:  # lint-amnesty, pylint: disable=missing-class-docstring
     )
     advanced_modules = List(
         display_name=_("Advanced Module List"),
+        default=["pdf", "scormxblock", "vimeo", "google-document", "google-calendar", "lti_consumer", "poll", "survey", "edx_sga", "library_content"], #Added by developer
         help=_("Enter the names of the advanced modules to use in your course."),
         scope=Scope.settings
     )
