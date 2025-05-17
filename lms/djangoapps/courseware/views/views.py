@@ -8,6 +8,7 @@ import logging
 import urllib
 from collections import OrderedDict, namedtuple
 from datetime import datetime
+import six
 from urllib.parse import quote_plus, urlencode, urljoin, urlparse, urlunparse
 
 import nh3

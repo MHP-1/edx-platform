@@ -3,13 +3,16 @@ Certificate HTML webview.
 """
 
 
+
 import logging
-import urllib
+import six
+import pytz
+
 from datetime import datetime
 from uuid import uuid4
-
-import pytz
 from django.conf import settings
+from django.utils.http import urlencode
+from django.urls import reverse
 from django.contrib.auth.decorators import login_required
 from django.http import Http404, HttpResponse, HttpResponseRedirect
 from django.template import RequestContext
@@ -25,6 +28,7 @@ from common.djangoapps.edxmako.shortcuts import render_to_response
 from common.djangoapps.edxmako.template import Template
 from common.djangoapps.student.models import LinkedInAddToProfileConfiguration
 from common.djangoapps.util.date_utils import strftime_localized
+from common.djangoapps.util.course import get_encoded_course_sharing_utm_params
 from common.djangoapps.util.views import handle_500
 from lms.djangoapps.certificates.api import (
     certificates_viewable_for_course,
@@ -54,6 +58,11 @@ from openedx.core.djangoapps.site_configuration import helpers as configuration_
 from openedx.core.lib.courses import course_image_url
 from openedx.core.lib.courses import get_course_by_id
 from xmodule.data import CertificatesDisplayBehaviors  # lint-amnesty, pylint: disable=wrong-import-order
+
+from course_manage.models import CourseManage
+from leaderboard.models import LeaderBoard
+from course_progress.models import CourseProgress
+
 
 log = logging.getLogger(__name__)
 _ = translation.gettext
@@ -271,73 +280,137 @@ def _update_social_context(request, context, course, user_certificate, platform_
     """
     Updates context dictionary with info required for social sharing.
     """
-    share_settings = configuration_helpers.get_value("SOCIAL_SHARING_SETTINGS", settings.SOCIAL_SHARING_SETTINGS)
-    context['facebook_share_enabled'] = share_settings.get('CERTIFICATE_FACEBOOK', False)
-    context['facebook_app_id'] = configuration_helpers.get_value("FACEBOOK_APP_ID", settings.FACEBOOK_APP_ID)
-    context['facebook_share_text'] = share_settings.get(
-        'CERTIFICATE_FACEBOOK_TEXT',
+    share_settings = configuration_helpers.get_value(
+        "SOCIAL_SHARING_SETTINGS", settings.SOCIAL_SHARING_SETTINGS
+    )
+    share_url = request.build_absolute_uri(
+        get_certificate_url(course_id=course.id, uuid=user_certificate.verify_uuid)
+    )
+    # share_url = request.build_absolute_uri(reverse("certificates:render_pdf_cert_by_uuid", kwargs={"certificate_uuid": user_certificate.verify_uuid}))
+    context["share_url"] = share_url
+    context["facebook_share_enabled"] = share_settings.get(
+        "CERTIFICATE_FACEBOOK", False
+    )
+    context["facebook_app_id"] = configuration_helpers.get_value(
+        "FACEBOOK_APP_ID", settings.FACEBOOK_APP_ID
+    )
+    facebook_share_text = share_settings.get(
+        "CERTIFICATE_FACEBOOK_TEXT",
         _("I completed the {course_title} course on {platform_name}.").format(
-            course_title=context['accomplishment_copy_course_name'],
-            platform_name=platform_name
+            course_title=context["accomplishment_copy_course_name"],
+            platform_name=platform_name,
+        ),
+    )
+    encoded_utm_parameters = get_encoded_course_sharing_utm_params()
+    facebook_share_url = "{url}?{utm_params}".format(
+        url=share_url, utm_params=encoded_utm_parameters["facebook"]
+    )
+    query_params = urlencode(
+        (
+            ("u", facebook_share_url),
+            ("quote", facebook_share_text),
         )
     )
-    context['twitter_share_enabled'] = share_settings.get('CERTIFICATE_TWITTER', False)
-    context['twitter_share_text'] = share_settings.get(
-        'CERTIFICATE_TWITTER_TEXT',
-        _("I completed a course at {platform_name}. Take a look at my certificate.").format(
-            platform_name=platform_name
-        )
+    certificate_img_url = user_certificate.share_image_url
+    # facebook_url = "https://www.facebook.com/sharer/sharer.php?{query}".format(query=query_params)
+    facebook_url = "https://www.facebook.com/dialog/feed?app_id=562442205353872&link={share_url}&redirect_uri=https://www.facebook.com&picture={certificate_img_url}".format(
+        share_url=share_url, certificate_img_url=certificate_img_url
+    )
+    context["facebook_url"] = facebook_url
+    context["twitter_share_enabled"] = share_settings.get("CERTIFICATE_TWITTER", False)
+    context["twitter_share_text"] = share_settings.get(
+        "CERTIFICATE_TWITTER_TEXT",
+        _(
+            "I completed a course at {platform_name}. Take a look at my certificate."
+        ).format(platform_name=platform_name),
     )
 
-    share_url = request.build_absolute_uri(get_certificate_url(course_id=course.id, uuid=user_certificate.verify_uuid))
-    context['share_url'] = share_url
-    twitter_url = ''
-    if context.get('twitter_share_enabled', False):
-        twitter_url = 'https://twitter.com/intent/tweet?text={twitter_share_text}&url={share_url}'.format(
-            twitter_share_text=smart_str(context['twitter_share_text']),
-            share_url=urllib.parse.quote_plus(smart_str(share_url))
+    twitter_url = ""
+    if context.get("twitter_share_enabled", False):
+        twitter_url = "https://twitter.com/intent/tweet?text={twitter_share_text}&url={share_url}".format(
+            twitter_share_text=smart_str(context["twitter_share_text"]),
+            share_url=six.moves.urllib.parse.quote_plus(smart_str(share_url)),
         )
-    context['twitter_url'] = twitter_url
-    context['linked_in_url'] = None
+    context["twitter_url"] = twitter_url
+    context["linked_in_url"] = None
     # If enabled, show the LinkedIn "add to profile" button
     # Clicking this button sends the user to LinkedIn where they
     # can add the certificate information to their profile.
     linkedin_config = LinkedInAddToProfileConfiguration.current()
-    if linkedin_config.is_enabled():
-        context['linked_in_url'] = linkedin_config.add_to_profile_url(
-            course.display_name, user_certificate.mode, smart_str(share_url), certificate=user_certificate
-        )
+    # if linkedin_config.is_enabled():
+    #     context['linked_in_url'] = linkedin_config.add_to_profile_url(
+    #         course.display_name, user_certificate.mode, smart_str(share_url), certificate=user_certificate
+    #     )
+    context[
+        "linked_in_url"
+    ] = "https://www.linkedin.com/sharing/share-offsite/?url={certificate_url}".format(
+        certificate_url=share_url
+    )
 
 
-def _update_context_with_user_info(context, user, user_certificate):
+def _update_context_with_user_info(request, context, user, user_certificate):
     """
     Updates context dictionary with user related info.
     """
-    user_fullname = get_preferred_certificate_name(user)
-
-    context['username'] = user.username
-    context['course_mode'] = user_certificate.mode
-    context['accomplishment_user_id'] = user.id
-    context['accomplishment_copy_name'] = user_fullname
-    context['accomplishment_copy_username'] = user.username
-
-    context['accomplishment_more_title'] = _("More Information About {user_name}'s Certificate:").format(
-        user_name=user_fullname
+    user_fullname = user_certificate.name
+    context["username"] = user.username
+    context["course_mode"] = user_certificate.mode
+    context["accomplishment_user_id"] = user.id
+    context["accomplishment_copy_name"] = user_fullname
+    context["accomplishment_copy_username"] = user.username
+    context["accomplishment_certificate_download"] = user_certificate.download_url
+    context["accomplishment_certificate_image"] = user_certificate.image_url
+    context["accomplishment_certificate_share_image"] = user_certificate.share_image_url
+    course_manage = CourseManage.objects.get(course_id=user_certificate.course_id)
+    context["accomplishment_cert_date"] = user_certificate.modified_date.strftime(
+        "%d-%m-%Y"
     )
+    context["accomplishment_course_description"] = (
+        course_manage.course.short_description
+        if course_manage.course.short_description
+        else ""
+    )
+    context["accomplishment_course_image"] = course_manage.course.course_image_url
+    context["disable_cookie_banner"] = True
+    if course_manage.certificate_type == "progress-based":
+        passing_date = CourseProgress.get_passing_date(user, user_certificate.course_id)
+    else:
+        passing_date = LeaderBoard.get_passing_date(user, user_certificate.course_id)
+    context["accomplishment_verify_url"] = request.build_absolute_uri(
+        reverse(
+            "certificates:render_cert_by_uuid",
+            kwargs={"certificate_uuid": user_certificate.verify_uuid},
+        )
+    )
+    if passing_date:
+        context["accomplishment_cert_date"] = passing_date.strftime("%d-%m-%Y")
+
+    context["accomplishment_course_type"] = course_manage.difficulty.name
+    context["credits_text"] = course_manage.credits
+    course_type_text = CourseManage.get_course_type(user_certificate.course_id)
+    context["accomplishment_course_type_text"] = (
+        course_type_text if course_type_text else "Configure Course Type"
+    )
+
+    context["accomplishment_more_title"] = _(
+        "More Information About {user_name}'s Certificate:"
+    ).format(user_name=user_fullname)
     # Translators: This line is displayed to a user who has completed a course and achieved a certification
-    context['accomplishment_banner_opening'] = _("{fullname}, you earned a certificate!").format(
-        fullname=user_fullname
-    )
+    context["accomplishment_banner_opening"] = _(
+        "{fullname}, you earned a certificate!"
+    ).format(fullname=user_fullname)
 
     # Translators: This line congratulates the user and instructs them to share their accomplishment on social networks
-    context['accomplishment_banner_congrats'] = _("Congratulations! This page summarizes what "
-                                                  "you accomplished. Show it off to family, friends, and colleagues "
-                                                  "in your social and professional networks.")
+    context["accomplishment_banner_congrats"] = _(
+        "Congratulations! This page summarizes what "
+        "you accomplished. Show it off to family, friends, and colleagues "
+        "in your social and professional networks."
+    )
 
     # Translators: This line leads the reader to understand more about the certificate that a student has been awarded
-    context['accomplishment_copy_more_about'] = _("More about {fullname}'s accomplishment").format(
-        fullname=user_fullname
-    )
+    context["accomplishment_copy_more_about"] = _(
+        "More about {fullname}'s accomplishment"
+    ).format(fullname=user_fullname)
 
 
 def _get_user_certificate(request, user, course_key, course_overview, preview_mode=None):
@@ -443,12 +516,46 @@ def render_cert_by_uuid(request, certificate_uuid):
     """
     try:
         certificate = GeneratedCertificate.eligible_certificates.get(
-            verify_uuid=certificate_uuid,
-            status=CertificateStatuses.downloadable
+            verify_uuid=certificate_uuid, status=CertificateStatuses.downloadable
         )
-        return render_html_view(request, str(certificate.course_id), certificate)
-    except GeneratedCertificate.DoesNotExist as e:
-        raise Http404 from e
+        course = CourseManage.objects.get(course_id=certificate.course_id)
+        if course.certificate_template == "pg_course_certificate":
+            template = "certificates/pg_course_certificate.html"
+        elif course.certificate_template == "women_health_course_certificate":
+            template = "certificates/women_health_course_certificate.html"
+        else:
+            template = "certificates/valid.html"
+        return render_html_view(
+            request, six.text_type(certificate.course_id), certificate, template=template
+        )
+    except GeneratedCertificate.DoesNotExist:
+        raise Http404
+
+
+def render_pdf_cert_by_uuid(request, certificate_uuid):
+    """
+    This public view generates an HTML representation of the specified certificate
+    """
+    try:
+        certificate = GeneratedCertificate.eligible_certificates.get(
+            verify_uuid=certificate_uuid, status=CertificateStatuses.downloadable
+        )
+        course = CourseManage.objects.get(course_id=certificate.course_id)
+        if course.certificate_template == "pg_course_certificate":
+            template = "certificates/pg_course_certificate_for_pdf.html"
+        elif course.certificate_template == "women_health_course_certificate":
+            template = "certificates/women_health_course_certificate_for_pdf.html"
+        else:
+            template = "certificates/certificate_for_pdf.html"
+
+        return render_html_view(
+            request,
+            six.text_type(certificate.course_id),
+            certificate,
+            template=template,
+        )
+    except GeneratedCertificate.DoesNotExist:
+        raise Http404
 
 
 @handle_500(
@@ -456,7 +563,7 @@ def render_cert_by_uuid(request, certificate_uuid):
     test_func=lambda request: request.GET.get('preview', None)
 )
 @pluggable_override('OVERRIDE_RENDER_CERTIFICATE_VIEW')
-def render_html_view(request, course_id, certificate=None):  # pylint: disable=too-many-statements
+def render_html_view(request, course_id, certificate=None, template=None):  # pylint: disable=too-many-statements
     """
     This public view generates an HTML representation of the specified user and course
     If a certificate is not available, we display a "Sorry!" screen instead
@@ -549,6 +656,15 @@ def render_html_view(request, course_id, certificate=None):  # pylint: disable=t
     with translation.override(certificate_language):
         context = {'user_language': user_language}
 
+        if request.GET.get("view") == "webview":
+            context.update(
+                {
+                    "disable_header": True,
+                    "disable_footer": True,
+                    "disable_cookie_banner": True,
+                    "disable_chat_link": True,
+                }
+            )
         _update_context_with_basic_info(context, course_id, platform_name, configuration)
 
         context['certificate_data'] = active_configuration
@@ -566,7 +682,7 @@ def render_html_view(request, course_id, certificate=None):  # pylint: disable=t
         context.update(catalog_data)
 
         # Append user info
-        _update_context_with_user_info(context, user, user_certificate)
+        _update_context_with_user_info(request, context, user, user_certificate)
 
         # Append social sharing info
         _update_social_context(request, context, course, user_certificate, platform_name)
@@ -604,7 +720,7 @@ def render_html_view(request, course_id, certificate=None):  # pylint: disable=t
         except CertificateRenderStarted.RenderCustomResponse as exc:
             response = exc.response
         else:
-            response = _render_valid_certificate(request, context, custom_template)
+            return _render_valid_certificate(request, context, custom_template, template)
 
         # Render the certificate
         return response
@@ -679,19 +795,18 @@ def _render_invalid_certificate(request, course_id, platform_name, configuration
     return render_to_response(cert_path, context)
 
 
-def _render_valid_certificate(request, context, custom_template=None):
-    """
-    Renders certificate
-    """
+def _render_valid_certificate(request, context, custom_template=None, template=None):
     if custom_template:
         template = Template(
             custom_template.template,
-            output_encoding='utf-8',
-            input_encoding='utf-8',
-            default_filters=['decode.utf8'],
-            encoding_errors='replace',
+            output_encoding="utf-8",
+            input_encoding="utf-8",
+            default_filters=["decode.utf8"],
+            encoding_errors="replace",
         )
         context = RequestContext(request, context)
         return HttpResponse(template.render(context))
+    elif template:
+        return render_to_response(template, context)
     else:
         return render_to_response("certificates/valid.html", context)
