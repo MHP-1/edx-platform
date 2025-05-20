@@ -1034,7 +1034,7 @@ def course_about_with_slug(request, slug_id):
             in_cart = False
 
         reg_then_add_to_cart_link = "{reg_url}?course_id={course_id}&enrollment_action=add_to_cart".format(
-            reg_url=reverse('register_user'), course_id=(str(course_id))
+            reg_url=reverse('signin_user'), course_id=(str(course_id))
         )
         context = {
             'course': course,
