@@ -188,7 +188,7 @@ class UserReadOnlySerializer(serializers.Serializer):  # lint-amnesty, pylint: d
             data.update(
                 {
                     "bio": AccountLegacyProfileSerializer.convert_empty_to_None(user_profile.bio),
-                    "country": AccountLegacyProfileSerializer.convert_empty_to_None(user_profile.country.code),
+                    "country": AccountLegacyProfileSerializer.convert_empty_to_None(user_profile.country.name), #Added by developer
                     "state": AccountLegacyProfileSerializer.convert_empty_to_None(user_profile.state),
                     "profile_image": AccountLegacyProfileSerializer.get_profile_image(
                         user_profile, user, self.context.get('request')

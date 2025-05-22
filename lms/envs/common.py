@@ -4239,6 +4239,7 @@ ACCOUNT_VISIBILITY_CONFIGURATION["bulk_shareable_fields"] = (
         "level_of_education",
         'social_links',
         'time_zone',
+        'postal_code',
     ]
 )
 

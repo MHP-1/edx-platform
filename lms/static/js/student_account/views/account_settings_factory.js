@@ -100,7 +100,7 @@
 
             fullNameFieldData = {
                 model: userAccountModel,
-                title: gettext('Full Name'),
+                title: gettext('Name'),
                 valueAttribute: 'name',
                 helpMessage: gettext('The name that is used for ID verification and that appears on your certificates.'), // eslint-disable-line max-len,
                 persistChanges: true
@@ -133,7 +133,7 @@
                 };
             } else {
                 countryFieldView = {
-                    view: new AccountSettingsFieldViews.DropdownFieldView(countryFieldData)
+                    view: new AccountSettingsFieldViews.ReadonlyFieldView(countryFieldData)
                 };
             }
 
@@ -178,6 +178,15 @@
                             })
                         },
                         {
+                            view: new AccountSettingsFieldViews.TextFieldView({
+                                model: userAccountModel,
+                                title: gettext('Mobile Number'),
+                                valueAttribute: 'phone_number',
+                                helpMessage: gettext('Your Mobile No. Enter your mobile no. with country code. i.e. +9198XXXXXXXX'),
+                                persistChanges: true
+                            })
+                        },
+                        {
                             view: new AccountSettingsFieldViews.LanguagePreferenceFieldView({
                                 model: userPreferencesModel,
                                 title: gettext('Language'),
@@ -194,6 +203,15 @@
                             })
                         },
                         countryFieldView,
+                        {
+                            view: new AccountSettingsFieldViews.TextFieldView({
+                                model: userAccountModel,
+                                title: gettext('PIN Code/ZIP/Postcode'),
+                                valueAttribute: 'postal_code',
+                                helpMessage: gettext('Your PIN Code/ZIP/Postcode.'),
+                                persistChanges: true
+                            })
+                        },
                         {
                             view: new AccountSettingsFieldViews.TimeZoneFieldView({
                                 model: userPreferencesModel,
@@ -318,7 +336,7 @@
             // Add the social link fields
             socialFields = {
                 title: gettext('Social Media Links'),
-                subtitle: gettext('Optionally, link your personal accounts to the social media icons on your edX profile.'), // eslint-disable-line max-len
+                subtitle: gettext('OOptionally, link your personal accounts to the social media icons on your MasterHealthPro profile.'), // eslint-disable-line max-len
                 fields: []
             };
 

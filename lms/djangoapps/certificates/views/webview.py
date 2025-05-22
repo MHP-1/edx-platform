@@ -305,14 +305,7 @@ def _update_social_context(request, context, course, user_certificate, platform_
     facebook_share_url = "{url}?{utm_params}".format(
         url=share_url, utm_params=encoded_utm_parameters["facebook"]
     )
-    query_params = urlencode(
-        (
-            ("u", facebook_share_url),
-            ("quote", facebook_share_text),
-        )
-    )
     certificate_img_url = user_certificate.share_image_url
-    # facebook_url = "https://www.facebook.com/sharer/sharer.php?{query}".format(query=query_params)
     facebook_url = "https://www.facebook.com/dialog/feed?app_id=562442205353872&link={share_url}&redirect_uri=https://www.facebook.com&picture={certificate_img_url}".format(
         share_url=share_url, certificate_img_url=certificate_img_url
     )
@@ -324,23 +317,11 @@ def _update_social_context(request, context, course, user_certificate, platform_
             "I completed a course at {platform_name}. Take a look at my certificate."
         ).format(platform_name=platform_name),
     )
-
-    twitter_url = ""
-    if context.get("twitter_share_enabled", False):
-        twitter_url = "https://twitter.com/intent/tweet?text={twitter_share_text}&url={share_url}".format(
-            twitter_share_text=smart_str(context["twitter_share_text"]),
-            share_url=six.moves.urllib.parse.quote_plus(smart_str(share_url)),
-        )
+    twitter_url = "https://twitter.com/intent/tweet?text={twitter_share_text}&url={share_url}".format(
+        twitter_share_text=smart_str(context["twitter_share_text"]),
+        share_url=six.moves.urllib.parse.quote_plus(smart_str(share_url)),
+    )
     context["twitter_url"] = twitter_url
-    context["linked_in_url"] = None
-    # If enabled, show the LinkedIn "add to profile" button
-    # Clicking this button sends the user to LinkedIn where they
-    # can add the certificate information to their profile.
-    linkedin_config = LinkedInAddToProfileConfiguration.current()
-    # if linkedin_config.is_enabled():
-    #     context['linked_in_url'] = linkedin_config.add_to_profile_url(
-    #         course.display_name, user_certificate.mode, smart_str(share_url), certificate=user_certificate
-    #     )
     context[
         "linked_in_url"
     ] = "https://www.linkedin.com/sharing/share-offsite/?url={certificate_url}".format(
