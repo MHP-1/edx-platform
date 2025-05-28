@@ -1,20 +1,30 @@
 """
 Tasks that operate on course certificates for a user
 """
-
+import six
+import re
+import os
+from PIL import Image
 from difflib import unified_diff
 from logging import getLogger
 from typing import Any, Dict, List
 
 from celery import shared_task
+from django.conf import settings
+from django.urls import reverse
 from celery_utils.persist_on_failure import LoggedPersistOnFailureTask, LoggedTask
 from django.contrib.auth import get_user_model
 from edx_django_utils.monitoring import set_code_owner_attribute
 from opaque_keys.edx.keys import CourseKey
 
-from lms.djangoapps.certificates.data import CertificateStatuses
-from lms.djangoapps.certificates.generation import generate_course_certificate
-from lms.djangoapps.certificates.models import CertificateTemplate
+from common.djangoapps.edxmako.shortcuts import render_to_response
+from openedx.core.lib.request_utils import get_request_or_stub
+from openedx.core.lib.courses import get_course_by_id
+from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
+from .data import CertificateStatuses
+from .generation import generate_course_certificate
+from .models import CertificateTemplate, GeneratedCertificate, CertificateHtmlViewConfiguration
+from course_manage.models import CourseManage
 
 log = getLogger(__name__)
 User = get_user_model()
@@ -170,6 +180,7 @@ def generate_course_cert_pdf(certificate_id):
     """
     Generate pdf for given template with given filename
     """
+    from pdf2image import convert_from_path
     certificate = GeneratedCertificate.objects.get(verify_uuid=certificate_id)
     file_path = "{root_path}certificate/{filename}.pdf".format(
         root_path=settings.MEDIA_ROOT, filename=certificate_id
@@ -193,9 +204,16 @@ def generate_course_cert_pdf(certificate_id):
     }
     try:
         pdfkit.from_url(cert_url, file_path, options=pdfkit_options)
-        logger.info("Certificate PDF generated successfully using cert_url")
+        log.info("Certificate PDF generated successfully using cert_url")
     except Exception as e:
-        logger.info("Failed to create pdf using cert_url. Error: {}".format(str(e)))
+        log.info("Failed to create pdf using cert_url. Error: {}".format(str(e)))
+        from .api import get_active_web_certificate
+        from .views.webview import (
+            _update_context_with_basic_info,
+            _update_context_with_user_info,
+            _update_course_context,
+            _update_organization_context,
+        )
         rep = {
             "/static": str(settings.LMS_ROOT_URL) + "/static",
             "/media": str(settings.LMS_ROOT_URL) + "/media",
@@ -223,9 +241,7 @@ def generate_course_cert_pdf(certificate_id):
             context, six.text_type(certificate.course_id), platform_name, configuration
         )
         _update_organization_context(context, course)
-        _update_course_context(
-            request, context, course, certificate.course_id, platform_name
-        )
+        _update_course_context(request, context, course, platform_name)
         _update_context_with_user_info(request, context, certificate.user, certificate)
         course = CourseManage.objects.get(course_id=certificate.course_id)
 
@@ -242,9 +258,9 @@ def generate_course_cert_pdf(certificate_id):
         )
         try:
             pdfkit.from_string(content, file_path, options=pdfkit_options)
-            logger.info("Certificate PDF generated successfully")
+            log.info("Certificate PDF generated successfully")
         except Exception as e:
-            logger.info("Failed to create pdf using content. Error: {}".format(str(e)))
+            log.info("Failed to create pdf using content. Error: {}".format(str(e)))
 
     certificate_url = "{lms_root}{media_url}certificate/{filename}.pdf".format(
         lms_root=settings.LMS_ROOT_URL,
@@ -266,7 +282,7 @@ def generate_course_cert_pdf(certificate_id):
     certificate.image_url = certificate_image
     certificate.share_image_url = share_image_url
     certificate.save()
-    logger.info("Certificate path: {}".format(certificate_url))
+    log.info("Certificate path: {}".format(certificate_url))
 
 
 def generate_certificate_images(file_path, certificate_id):
@@ -300,7 +316,7 @@ def generate_certificate_images(file_path, certificate_id):
         resized_img.paste(new_img, (left, top))
         resized_img.save(resized_img_path)
     except Exception as e:
-        logger.info(
+        log.info(
             "Failed to create certificate image using cert_pdf. Error: {}".format(
                 str(e)
             )
