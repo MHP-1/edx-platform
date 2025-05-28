@@ -180,6 +180,7 @@ def generate_course_cert_pdf(certificate_id):
     """
     Generate pdf for given template with given filename
     """
+    import pdfkit
     from pdf2image import convert_from_path
     certificate = GeneratedCertificate.objects.get(verify_uuid=certificate_id)
     file_path = "{root_path}certificate/{filename}.pdf".format(
