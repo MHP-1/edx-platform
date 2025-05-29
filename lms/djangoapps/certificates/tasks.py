@@ -181,7 +181,6 @@ def generate_course_cert_pdf(certificate_id):
     Generate pdf for given template with given filename
     """
     import pdfkit
-    from pdf2image import convert_from_path
     certificate = GeneratedCertificate.objects.get(verify_uuid=certificate_id)
     file_path = "{root_path}certificate/{filename}.pdf".format(
         root_path=settings.MEDIA_ROOT, filename=certificate_id
@@ -290,6 +289,7 @@ def generate_certificate_images(file_path, certificate_id):
     """
     Genereate share and certificate images for given data
     """
+    from pdf2image import convert_from_path
     try:
         images = convert_from_path(file_path)
         certificate_img_path = "{root_path}certificate/{filename}.jpg".format(
