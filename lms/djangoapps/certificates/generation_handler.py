@@ -168,6 +168,10 @@ def _can_generate_regular_certificate(user, course_key, enrollment_mode, course_
     Check if a regular (non-allowlist) course certificate can be generated (created if it doesn't already exist, or
     updated if it does exist) for this user, in this course run.
     """
+    # Added by Developer
+    from course_manage.models import CourseManage
+    from course_progress.models import CourseProgress
+    course_manage = CourseManage.objects.get(course_id=course_key)
     if _is_ccx_course(course_key):
         log.info(f'{course_key} is a CCX course. Certificate cannot be generated for {user.id}.')
         return False
@@ -176,7 +180,13 @@ def _can_generate_regular_certificate(user, course_key, enrollment_mode, course_
         log.info(f'{user.id} is a beta tester in {course_key}. Certificate cannot be generated.')
         return False
 
-    if not _is_passing_grade(course_grade):
+
+    if course_manage.certificate_type == "progress-based":
+        course_progress = CourseProgress.get_course_progress(user, course_key)
+        if course_progress < float(course_manage.passing_progress or 0):
+            log.info(f'{user.id} does not have a passing grade in {course_key}. Certificate cannot be generated.')
+            return False
+    elif not _is_passing_grade(course_grade):
         log.info(f'{user.id} does not have a passing grade in {course_key}. Certificate cannot be generated.')
         return False
 
