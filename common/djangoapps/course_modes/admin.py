@@ -194,10 +194,10 @@ class CourseModeAdmin(admin.ModelAdmin):
         "min_price",
         "strike_price",
         "currency",
-        "sku",
+        # "sku",
     )
     search_fields = ("course__id", "mode_display_name")
-    list_display = ("id", "course", "mode_display_name", "mode_slug", "min_price", "strike_price", "sku")
+    list_display = ("id", "course", "mode_display_name", "mode_slug", "min_price", "strike_price")
 
     def expiration_datetime_custom(self, obj):
         """adding custom column to show the expiry_datetime"""

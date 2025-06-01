@@ -150,6 +150,8 @@ from openedx.features.enterprise_support.api import data_sharing_consent_require
 from course_manage.models import CourseManage
 from shoppingcart.utils import is_shopping_cart_enabled
 from shoppingcart.models import Order, PaidCourseRegistration, CourseRegCodeItem
+from subscription.models import UserSubscription
+from course_progress.models import CourseProgress
 
 from ..block_render import get_block, get_block_by_usage_id, get_block_for_descriptor
 from ..tabs import _get_dynamic_tabs
@@ -157,6 +159,7 @@ from ..toggles import (
     COURSEWARE_OPTIMIZED_RENDER_XBLOCK,
     ENABLE_COURSE_DISCOVERY_DEFAULT_LANGUAGE_FILTER,
 )
+
 
 log = logging.getLogger("edx.courseware")
 
@@ -1205,8 +1208,31 @@ def _progress(request, course_key, student_id):
 
     course_expiration_fragment = generate_course_expired_fragment(student, course)
 
+    # Added by Developer
+    course_grade = CourseGradeFactory().read(student, course)
+    courseware_summary = list(course_grade.chapter_grades.values())
+
+    studio_url = get_studio_url(course, 'settings/grading')
+    # checking certificate generation configuration
+    enrollment_mode, _ = CourseEnrollment.enrollment_mode_for_user(student, course_key)
+
+    course_expiration_fragment = generate_course_expired_fragment(student, course)
+    course_manage = CourseManage.objects.get(course_id=course.id)
+    verified_mode = CourseMode.mode_for_course(course_key, "verified"),
+    currency, price, strike_price = CourseMode.get_course_price_and_currency(
+        course_key, request.session.get("country_code", "IN")
+    )
+
+    cart = Order.get_cart_for_user(request.user)
+    in_cart = PaidCourseRegistration.contained_in_order(cart, course_key) or \
+        CourseRegCodeItem.contained_in_order(cart, course_key)
+    if in_cart and cart.currency != currency:
+        cart.delete()
+        in_cart = False
+
     context = {
         'course': course,
+        'course_manage': course_manage,
         'courseware_summary': courseware_summary,
         'studio_url': studio_url,
         'grade_summary': course_grade.summary,
@@ -1217,7 +1243,14 @@ def _progress(request, course_key, student_id):
         'student': student,
         'credit_course_requirements': credit_course_requirements(course_key, student),
         'course_expiration_fragment': course_expiration_fragment,
-        'certificate_data': get_cert_data(student, course, enrollment_mode, course_grade)
+        'certificate_data': get_cert_data(student, course, enrollment_mode, course_grade),
+        'enrollment_mode': enrollment_mode,
+        'verified_mode': verified_mode,
+        'currency': currency,
+        'price': price,
+        'strike_price': strike_price,
+        'cart_link': reverse('shoppingcart:shoppingcart.views.show_cart'),
+        'in_cart': in_cart
     }
 
     context.update(
@@ -1226,6 +1259,39 @@ def _progress(request, course_key, student_id):
             student,
         )
     )
+
+    # Added by Developer
+    if course_manage.certificate_type == "progress-based":
+        course_progress = CourseProgress.get_course_progress(student, course.id)
+        is_passed = course_progress > float(course_manage.passing_progress or 0)
+        grade_summary = {
+            "grade": "Pass" if is_passed else None,
+            "grade_breakdown": OrderedDict(
+                [(
+                    "Total Progress",
+                    {
+                        "category": "Total Progress",
+                        "detail": "Total Progress = {}% of a possible 100.00%".format(
+                            course_progress
+                        ),
+                        "percent": course_progress / 100,
+                    },
+                )]
+            ),
+            "percent": course_progress / 100,
+            "section_breakdown": []
+        }
+        try:
+            passing_progress = float(course_manage.passing_progress) or 0
+        except Exception as e:
+            passing_progress = 0
+
+        context.update(
+            {
+                "progress_cutoffs": {"Pass": passing_progress / 100},
+                "grade_summary": grade_summary,
+            }
+        )
 
     with outer_atomic():
         response = render_to_response('courseware/progress.html', context)
@@ -1285,24 +1351,44 @@ def get_cert_data(student, course, enrollment_mode, course_grade=None):
     Returns:
         returns dict if course certificate is available else None.
     """
-    cert_data = _certificate_message(student, course, enrollment_mode)
-    if not CourseMode.is_eligible_for_certificate(enrollment_mode, status=cert_data.cert_status):
-        return INELIGIBLE_PASSING_CERT_DATA.get(enrollment_mode)
+    # Added by Developer
+    certificate_access = UserSubscription.verify_certificate_access(student, course.id)
 
-    if cert_data.cert_status == EARNED_BUT_NOT_AVAILABLE_CERT_STATUS:
+    if not certificate_access:
+        return
+
+    course_manage = CourseManage.objects.get(course_id=course.id)
+    if course_manage.certificate_type == "progress-based":
+        course_progress = CourseProgress.get_course_progress(student, course.id)
+        if course_progress < float(course_manage.passing_progress or 0):
+            return
+
+        cert_data = _certificate_message(student, course, enrollment_mode)
+        if not CourseMode.is_eligible_for_certificate(enrollment_mode, status=cert_data.cert_status):
+            return INELIGIBLE_PASSING_CERT_DATA.get(enrollment_mode)
+        if cert_data.cert_status == "downloadable":
+            return cert_data
+
+        return REQUESTING_CERT_DATA
+    else:
+        cert_data = _certificate_message(student, course, enrollment_mode)
+        if not CourseMode.is_eligible_for_certificate(enrollment_mode, status=cert_data.cert_status):
+            return INELIGIBLE_PASSING_CERT_DATA.get(enrollment_mode)
+
+        if cert_data.cert_status == EARNED_BUT_NOT_AVAILABLE_CERT_STATUS:
+            return cert_data
+
+        certificates_enabled_for_course = certs_api.has_self_generated_certificates_enabled(course.id)
+        if course_grade is None:
+            course_grade = CourseGradeFactory().read(student, course)
+
+        if not certs_api.can_show_certificate_message(course, student, course_grade, certificates_enabled_for_course):
+            return
+
+        if not certs_api.get_active_web_certificate(course) and not certs_api.is_valid_pdf_certificate(cert_data):
+            return
+
         return cert_data
-
-    certificates_enabled_for_course = certs_api.has_self_generated_certificates_enabled(course.id)
-    if course_grade is None:
-        course_grade = CourseGradeFactory().read(student, course)
-
-    if not certs_api.can_show_certificate_message(course, student, course_grade, certificates_enabled_for_course):
-        return
-
-    if not certs_api.get_active_web_certificate(course) and not certs_api.is_valid_pdf_certificate(cert_data):
-        return
-
-    return cert_data
 
 
 def credit_course_requirements(course_key, student):
@@ -1610,7 +1696,6 @@ def generate_user_cert(request, course_id):
                 platform_name=configuration_helpers.get_value('PLATFORM_NAME', settings.PLATFORM_NAME)
             )
         )
-
     student = request.user
     course_key = CourseKey.from_string(course_id)
 
@@ -1619,6 +1704,16 @@ def generate_user_cert(request, course_id):
         return HttpResponseBadRequest(_("Course is not valid"))
 
     log.info(f'Attempt will be made to generate a course certificate for {student.id} : {course_key}.')
+    # Added by Developer
+    course_manage = CourseManage.objects.get(course_id=course.id)
+    if course_manage.certificate_type == "progress-based":
+        course_progress = CourseProgress.get_course_progress(student, course.id)
+        if course_progress < float(course_manage.passing_progress or 0):
+            log.info(u"User %s has not passed the course: %s", student.username, course_id)
+            return HttpResponseBadRequest(_("Your certificate will be available when you complete the course."))
+    elif not is_course_passed(student, course):
+        log.info("User %s has not passed the course: %s", student.username, course_id)
+        return HttpResponseBadRequest(_("Your certificate will be available when you pass the course."))
 
     try:
         certs_api.generate_certificate_task(student, course_key, 'self')
@@ -1629,10 +1724,6 @@ def generate_user_cert(request, course_id):
             course_key,
         )
         return HttpResponseBadRequest(str(e))
-
-    if not is_course_passed(student, course):
-        log.info("User %s has not passed the course: %s", student.username, course_id)
-        return HttpResponseBadRequest(_("Your certificate will be available when you pass the course."))
 
     certificate_status = certs_api.certificate_downloadable_status(student, course.id)
 
@@ -1645,7 +1736,8 @@ def generate_user_cert(request, course_id):
     )
 
     if certificate_status["is_downloadable"]:
-        return HttpResponseBadRequest(_("Certificate has already been created."))
+        # return HttpResponseBadRequest(_("Certificate has already been created."))
+        return HttpResponse()
     elif certificate_status["is_generating"]:
         return HttpResponseBadRequest(_("Certificate is being created."))
 

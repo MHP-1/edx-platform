@@ -1363,19 +1363,14 @@ def handle_certificate_date_override_delete(sender, instance, **kwargs):    # py
     transaction.on_commit(instance.send_course_cert_changed_signal)
 
 
-@receiver(COURSE_CERT_AWARDED, sender=GeneratedCertificate)
-def generate_cert_pdf(sender, user, course_key, status, **kwargs):
+@receiver(models.signals.post_save, sender=GeneratedCertificate)
+def generate_cert_pdf(sender, instance, **kwargs):
     """
     Generated pdf file for awarded certificate
     """
     from .tasks import generate_course_cert_pdf
-    context = dict()
-    if status == "downloadable":
-        certificate = GeneratedCertificate.objects.get(
-            user=user, course_id=course_key, status=status
-        )
-        if not certificate.download_url:
-            try:
-                generate_course_cert_pdf(certificate.verify_uuid)
-            except Exception as e:
-                pass
+    if instance.status == "downloadable" and not instance.download_url:
+        try:
+            generate_course_cert_pdf(instance.verify_uuid)
+        except Exception as e:
+            pass

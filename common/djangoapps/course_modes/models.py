@@ -836,35 +836,18 @@ class CourseMode(models.Model):
         """
         strike_price = 0
         try:
-            log.info("Price")
             verified_mode = CourseMode.mode_for_course(course_id, "verified")
             if verified_mode:
                 mode_obj = cls.objects.get(course__id=course_id, mode_slug=CourseMode.VERIFIED)
             else:    
                 mode_obj = CourseMode.objects.get(course__id=course_id)
-            log.info("mode_obj:{}".format(mode_obj))
             if mode_obj.min_price > 0:
-                product_id = mode_obj.sku
-                api_url = "{endpoint}/api/2.0/prices?product_ids={product_id}&customer_country={country_code}".format(endpoint=settings.PADDLE_API_URL,product_id=product_id,country_code=country_code)
-                response = requests.get(api_url)
-                products = response.json().get("response").get("products")
-                log.info("products:{}".format(products))
-                if products:
-                    product = products[0]
-                    currency = product.get("currency")
-                    price = round(product.get("price").get("gross"), 0)
-                    log.info("price:{}".format(price))
-                else:
-                    currency = mode_obj.currency.upper()
-                    price = mode_obj.min_price
-                    log.info("else price:{}".format(price))
-
+                currency = mode_obj.currency.upper()
+                price = mode_obj.min_price
                 if mode_obj.strike_price > 0:
                     strike_price = price / (1 - (mode_obj.strike_price/100))
-                    log.info("strike_price:{}".format(strike_price))
                 return currency, int(price), int(strike_price)
             else:
-                log.info("Not Price")
                 return settings.PAID_COURSE_REGISTRATION_CURRENCY[0].upper(), 0, 0    
         except Exception as e:
             log.info("Failed to get course price. Error: {}".format(str(e)))
