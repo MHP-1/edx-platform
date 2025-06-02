@@ -1,0 +1,114 @@
+<%!
+    from django.conf import settings
+    from django.urls import reverse
+    from six import text_type
+%>
+<%namespace name='static' file='../static_content.html'/>
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <meta property="og:image" content="${accomplishment_certificate_share_image}" />
+        <meta property="og:type" content="website">
+        <meta property="og:url" content="${accomplishment_verify_url}">
+        <meta property="og:title" content="${accomplishment_course_type_text}">
+        <meta property="og:description" content="${accomplishment_course_description}">
+
+        <meta name="twitter:title" content="${accomplishment_course_type_text}" />
+        <meta name="twitter:image" content="${accomplishment_certificate_share_image}" />
+        <meta name="twitter:description" content="${accomplishment_course_description}" />
+
+        <link rel="icon" type="image/x-icon" href="${static.url('images/fav_icon.png')}"/>
+        <link rel="stylesheet" href="${static.url('custom_css/pdf_certificate.css')}" />
+        <title>${accomplishment_course_type_text} </title>
+    </head>
+    <body style="margin: 0; height: 100%;">
+        <main style="width: 100%;display: flex; gap: 25px;grid-template-columns: 1fr 1fr;justify-content: center;align-items: flex-start; height: 100%;">
+            <div class="cert_container" style="width:908px;height:610px">
+                <div class="cert_container_bg" style="width:842px;height:595px background-size: cover;">
+                    <div class="cert_container_brdr" style="width:842px;height:595px">
+                        <div class="cert_container_brdr_right" style="width:842px;height:595px">
+                            <div class="cert_content_pad" style="width:842px;height:595px;padding: 30px 0px 20px;">
+                                <div class="cert_logo mt-10" style="margin-left: 48px !important;">
+                                    <div class="cert_header" style="padding:0px;">
+                                        <img src="${static.url('images/Certificate-MHPro-Proficiency-04.png')}" />
+                                    </div>
+                                </div>
+                                <h2 class="text-center montHeader" style="text-transform: uppercase; margin-left: 48px !important;">${accomplishment_course_type_text}</h2>
+                                <div class="cert_info" style="display: block; margin-left: 28px;">
+                                    <div class="info_1" style="display: block;">
+                                        <p class=" fontBlack font14 fontMedium" style="width:842px;display: block;">This is to certify that <span class="fontBold font14" id="certi_name_id">${accomplishment_copy_name}</span> has successfully completed the course in &nbsp;
+                                        </p>
+                                    </div>
+                                    <div class="info_2" style="display: block;">
+                                        <p class="font14 fontBlack fontMedium" style="width:842px;display: block;"><span class="programName font14 fontBold fontBlack">${accomplishment_copy_course_name}</span>&nbsp;on&nbsp; <span class="font14 fontBlack fontMedium">${accomplishment_cert_date}</span>
+                                        </p>
+                                    </div>
+                                </div>
+                                % if credits_text:
+                                    <p class="text-center fontBlack fontBold font14 mt-10" style="margin-top: 22px; margin-left: 28px !important;">Credits: ${credits_text}</p>
+                                % endif
+                                <div class="sign_container" style="margin-left: 28px !important;">
+                                    <p class="text-center fontMedium font14 fontBlack" style="margin-top:22px;">Certified by MasterHealthPro Inc., USA</p>
+                                    <div class="cert_sign grid-center" style="width: 842px;display: -webkit-box;-webkit-box-pack: center;justify-content: center;">
+                                        <div class="right_sign" style="width: 200px;max-width: 200px;text-align: center;">
+                                            <img src="${static.url('images/Padmini_Prasad_Sign.png')}" />
+                                            <div style="top:5px;position:relative">
+                                                <p class="fontBlack font600 font10 p-left">Dr. Padmini Prasad</p>
+                                                <p class="fontBlack font600 font10 p-left">Course Director</p>
+                                            </div>
+                                        </div>
+                                        <div class="right_sign" style="width: 200px;max-width: 200px;text-align: center;">
+                                            <img src="${static.url('images/SS_Vasan_Sign.png')}" />
+                                            <div style="top:5px;position:relative">
+                                                <p class="fontBlack font600 font10" >Dr. SS Vasan</p>
+                                                <p class="fontBlack font600 font10">Program Director</p>
+                                            </div>
+                                        </div>
+                                        <div class="right_sign" style="width: 200px;max-width: 200px;text-align: center;padding-top: 5px;">
+                                            <img src="${static.url('images/Suresh_Elangovan_Sign.png')}"/>
+                                            <p class="fontBlack font600 font10">Suresh Elangovan</p>
+                                            <p class="fontBlack font600 font10">President & CEO</p>
+                                        </div>
+                                    </div>
+                                </div>
+                                <p class="text-center fontBlack fontMedium font14 mt-10" style="margin-left:48px !important;">In Association with</p>
+                                <div class="cert_desc flex-center " style="display: -webkit-box;display: flex;-webkit-box-pack: center;justify-content: space-evenly !important; align-items: center;width:100%;">
+                                    % if credits_text:
+                                        <div style="text-align: center;display: block;width: 300px;max-width: 300px; margin-right: 0px;">
+                                            <img style="width:60px; height:80px; margin-top:-3px; margin-left:5px; object-fit: contain;" src="${static.url('images/cpd logo.png')}" />
+
+                                            <p style="font-size: 7px; font-family: 'Montserrat-Regular', sans-serif !important; color: #4A494A; line-height: 1.5;">THE CPD STANDARDS, UK</p>
+                                            <p style="font-size: 7px; font-family: 'Montserrat-Regular', sans-serif !important; color: #4A494A; ">CPD PROVIDER, 50493</p>
+                                        </div>
+                                    % endif
+                                    <div style="text-align: center;display: block;width: 220px;max-width: 220px;padding-top: 32px;">
+                                        <img class="asso_img_2" src="${static.url('images/isamh.png')}" />
+                                        
+                                            <p style="font-size: 7px; font-family: 'Montserrat-Regular', sans-serif !important; color: #4A494A; line-height: 1.5;">INTERNATIONAL SOCIETY OF FERTILITY &</p>
+                                            <p style="font-size: 7px; font-family: 'Montserrat-Regular', sans-serif !important; color: #4A494A; ">REPRODUCTIVE HEALTH</p>
+                                        
+                                    </div>
+                                    <div style="text-align: center;display: block;width: 260px;max-width: 260px;height: 107px;">
+                                        <img class="asso_img_3" style="margin-top:-3px; margin-left:10px;" src="${static.url('images/sassm.png')}" />
+                                        
+                                            <p style="font-size: 7px; font-family: 'Montserrat-Regular', sans-serif !important; color: #4A494A; line-height: 1.5;">SOUTH ASIAN SOCIETY FOR</p>
+                                            <p style="font-size: 7px; font-family: 'Montserrat-Regular', sans-serif !important; color: #4A494A; ">SEXUAL MEDICINE</p>
+                                        
+                                    </div>
+                                </div>
+                                <div class="verify" style="display: block;text-align: center;margin-top:18px !important; margin-left:45px !important">
+                                    <p class="font11 fontLBlack fontReg" style="font-size:10px;">Verify the certificate at:
+                                        <a class="font11 fontReg fontBlue" href="${accomplishment_verify_url}" style="font-size:10px;">${accomplishment_verify_url}</a>
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </body>
+</html>
