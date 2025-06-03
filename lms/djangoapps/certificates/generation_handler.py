@@ -138,7 +138,8 @@ def _generate_certificate_task(user, course_key, enrollment_mode, course_grade, 
     if generation_mode is not None:
         kwargs['generation_mode'] = generation_mode
 
-    generate_certificate.apply_async(countdown=delay_seconds, kwargs=kwargs)
+    # Updated by developer
+    generate_certificate(kwargs=kwargs)
     return True
 
 

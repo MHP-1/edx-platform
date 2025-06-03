@@ -34,11 +34,12 @@ User = get_user_model()
 CERTIFICATE_DELAY_SECONDS = 2
 
 
-@shared_task(
-    base=LoggedPersistOnFailureTask, bind=True, default_retry_delay=30, max_retries=2
-)
-@set_code_owner_attribute
-def generate_certificate(self, **kwargs):  # pylint: disable=unused-argument
+# Updated by developer
+# @shared_task(
+#     base=LoggedPersistOnFailureTask, bind=True, default_retry_delay=30, max_retries=2
+# )
+# @set_code_owner_attribute
+def generate_certificate(kwargs=dict()):  # pylint: disable=unused-argument
     """
     Generates a certificate for a single user.
 
