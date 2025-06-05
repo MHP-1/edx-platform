@@ -5,6 +5,7 @@ import logging
 from collections import defaultdict
 
 import search
+from datetime import datetime
 from django.conf import settings
 from django.contrib.auth.models import AnonymousUser, User  # lint-amnesty, pylint: disable=imported-auth-user
 from django.urls import reverse
@@ -169,8 +170,27 @@ def list_courses(request,
     course_qs = get_courses(
         user, org=org, filter_=filter_, permissions=permissions, active_only=active_only, course_keys=course_keys
     )
+    # Added by developer
+    course_qs = _filter_by_additional_details(course_qs)
     course_qs = _filter_by_search(course_qs, search_term, mobile_search)
     return course_qs
+
+# Added by developer
+def _filter_by_additional_details(course_queryset):
+    """
+    Filter course by custom requirements
+    """
+    available_courses = CourseOverview.objects.filter(
+        coursemanage__coming_soon_date__lte=datetime.now(),
+        enrollment_end__gte=datetime.now(),
+    ).values_list('id', flat=True)
+    return LazySequence(
+        (
+            course for course in course_queryset
+            if course.id in available_courses
+        ),
+        est_len=len(course_queryset)
+    )
 
 
 @function_trace('list_course_keys')

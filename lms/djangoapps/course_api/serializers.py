@@ -12,6 +12,7 @@ from edx_django_utils import monitoring as monitoring_utils
 from rest_framework import serializers
 
 from lms.djangoapps.certificates.api import can_show_certificate_available_date_field
+from common.djangoapps.course_modes.models import CourseMode, get_course_prices
 from openedx.core.djangoapps.content.course_overviews.models import \
     CourseOverview  # lint-amnesty, pylint: disable=unused-import
 from openedx.core.djangoapps.models.course_details import CourseDetails
@@ -116,6 +117,9 @@ class CourseSerializer(serializers.Serializer):  # pylint: disable=abstract-meth
     mobile_available = serializers.BooleanField()
     hidden = serializers.SerializerMethodField()
     invitation_only = serializers.BooleanField()
+    # Added by Developer
+    price = serializers.SerializerMethodField()
+    payment_url = serializers.SerializerMethodField()
 
     # 'course_id' is a deprecated field, please use 'id' instead.
     course_id = serializers.CharField(source='id', read_only=True)
@@ -137,6 +141,25 @@ class CourseSerializer(serializers.Serializer):  # pylint: disable=abstract-meth
             urllib.parse.urlencode({'course_id': course_overview.id}),
         ])
         return self.context['request'].build_absolute_uri(base_url)
+
+    # Added by Developer
+    def get_price(self, course_overview):
+        """
+        Get course price else set 'Free'
+        """
+        registration_price, course_price = get_course_prices(course_overview)
+        currency, price, strike_price = CourseMode.get_course_price_and_currency(course_overview.id, self.context['request'].session.get('country_code', "IN"))
+        if course_price != 'Free':
+            return "{currency} {price}".format(currency=currency, price=price)
+        else:
+            return "Free"
+
+    def get_payment_url(self, course_overview):
+        """
+        Get Course about page url for website
+        """
+        return self.context['request'].build_absolute_uri(reverse('about_course', args=[str(course_overview.id)]))
+
 
 
 class CourseDetailSerializer(CourseSerializer):  # pylint: disable=abstract-method
