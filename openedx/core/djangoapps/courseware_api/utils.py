@@ -54,6 +54,8 @@ def serialize_upgrade_info(user, course_overview, enrollment):
 
     This is used in a few API views to provide consistent upgrade info to frontends.
     """
+    # Added by Developer
+    return None
     if not can_show_verified_upgrade(user, enrollment):
         return None
 
