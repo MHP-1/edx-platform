@@ -267,7 +267,7 @@
                     $form = $('#' + type + '-form'),
                     scrollX = window.scrollX,
                     scrollY = window.scrollY,
-                    queryParams = url('?'),
+                    queryParams = url2('?'),
                     queryStr = queryParams.length > 0 ? '?' + queryParams : '';
 
                 e.preventDefault();
