@@ -491,7 +491,7 @@ def get_course_date_blocks(course, user, request=None, include_access=False,
         CourseStartDate,
         TodaysDate,
         VerificationDeadlineDate,
-        VerifiedUpgradeDeadlineDate,
+        # VerifiedUpgradeDeadlineDate,
     ]
     blocks.extend([cls(course, user) for cls in default_block_classes])
 
