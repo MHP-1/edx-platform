@@ -239,11 +239,22 @@ class CourseMode(models.Model):
     def __init__(self, *args, **kwargs):  # lint-amnesty, pylint: disable=useless-super-delegation
         super().__init__(*args, **kwargs)
 
+
+
     def clean(self):
         """
         Object-level validation - implemented in this method so DRF serializers
         catch errors in advance of a save() attempt.
         """
+        if self.min_price > 0 and self.min_price_usd <= 0:
+            raise ValidationError({
+                'min_price_usd': _("Price in USD must be greater than 0 if Price in INR is greater than 0.")
+            })
+        if self.min_price_usd > 0 and self.min_price <= 0:
+            raise ValidationError({
+                'min_price': _("Price in INR must be greater than 0 if Price in USD is greater than 0.")
+            })
+
         if self.is_professional_slug(self.mode_slug) and self.expiration_datetime is not None:
             raise ValidationError(
                 _("Professional education modes are not allowed to have expiration_datetime set.")
