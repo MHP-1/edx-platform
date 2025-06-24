@@ -67,7 +67,8 @@ class CourseMode(models.Model):
     # Historical note: We used to allow users to choose from several prices, but later
     # switched to using a single price.  Although this field is called `min_price`, it is
     # really just the price of the course.
-    min_price = models.IntegerField(default=0, verbose_name=_("Price"))
+    min_price = models.IntegerField(default=0, verbose_name=_("Price in INR"))
+    min_price_usd = models.IntegerField(default=0, verbose_name=_("Price in USD"))
     strike_price = models.IntegerField(default=0, verbose_name=_("Strike Price(%)"))
 
     # the currency these prices are in, using lower case ISO currency codes
@@ -836,35 +837,18 @@ class CourseMode(models.Model):
         """
         strike_price = 0
         try:
-            log.info("Price")
             verified_mode = CourseMode.mode_for_course(course_id, "verified")
             if verified_mode:
                 mode_obj = cls.objects.get(course__id=course_id, mode_slug=CourseMode.VERIFIED)
             else:    
                 mode_obj = CourseMode.objects.get(course__id=course_id)
-            log.info("mode_obj:{}".format(mode_obj))
-            if mode_obj.min_price > 0:
-                product_id = mode_obj.sku
-                api_url = "{endpoint}/api/2.0/prices?product_ids={product_id}&customer_country={country_code}".format(endpoint=settings.PADDLE_API_URL,product_id=product_id,country_code=country_code)
-                response = requests.get(api_url)
-                products = response.json().get("response").get("products")
-                log.info("products:{}".format(products))
-                if products:
-                    product = products[0]
-                    currency = product.get("currency")
-                    price = round(product.get("price").get("gross"), 0)
-                    log.info("price:{}".format(price))
-                else:
-                    currency = mode_obj.currency.upper()
-                    price = mode_obj.min_price
-                    log.info("else price:{}".format(price))
 
-                if mode_obj.strike_price > 0:
-                    strike_price = price / (1 - (mode_obj.strike_price/100))
-                    log.info("strike_price:{}".format(strike_price))
-                return currency, int(price), int(strike_price)
+            if mode_obj.min_price > 0:
+                if country_code.lower() == "in": #Return INR price and currency for users outside the india
+                    return settings.PAID_COURSE_REGISTRATION_CURRENCY[0].upper(), int(mode_obj.min_price), int(strike_price)
+                else:
+                    return "USD", int(mode_obj.min_price_usd), int(strike_price)
             else:
-                log.info("Not Price")
                 return settings.PAID_COURSE_REGISTRATION_CURRENCY[0].upper(), 0, 0    
         except Exception as e:
             log.info("Failed to get course price. Error: {}".format(str(e)))
