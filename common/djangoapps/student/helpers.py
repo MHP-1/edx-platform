@@ -757,6 +757,11 @@ def do_create_account(form, custom_form=None, request=None):
         if response.status_code != 200:
             log.info("Failed to call firstpromoter lead api. Response:{}".format(response.json()))
         del request.session['referral_code']
+
+    #Send data to exam portal
+    from exam_module.apis import register_user_to_exam_portal
+    register_user_to_exam_portal(user, normalize_password(form.cleaned_data["password"]))
+
     return user, profile, registration
 
 

@@ -820,6 +820,9 @@ class LogistrationPasswordResetView(APIView):  # lint-amnesty, pylint: disable=m
                 if LoginFailures.is_feature_enabled():
                     LoginFailures.clear_lockout_counter(user)
 
+                # Added by Developer
+                from exam_module.apis import change_password_to_exam_portal
+                change_password_to_exam_portal(user, password)
                 send_password_reset_success_email(user, request)
                 update_session_auth_hash(request, user)
         except ValidationError as err:
