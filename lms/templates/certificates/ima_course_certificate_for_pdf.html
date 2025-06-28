@@ -21,12 +21,12 @@
         <meta name="twitter:description" content="${accomplishment_course_description}" />
 
         <link rel="icon" type="image/x-icon" href="${static.url('images/fav_icon.png')}"/>
-        <link rel="stylesheet" href="${static.url('custom_css/pdf_certificate.css')}" />
+        <link rel="stylesheet" href="${static.url('custom_css/ima_pdf_certificate.css')}" />
         <title>${accomplishment_course_type_text} </title>
     </head>
     <body style="margin: 0; height: 100%;">
         <main style="width: 100%;display: flex; gap: 25px;grid-template-columns: 1fr 1fr;justify-content: center;align-items: flex-start; height: 100%;">
-            <div class="cert_container" style="width:908px;height:615px">
+            <div class="cert_container" style="width:908px;height:640px">
                 <div class="cert_container_bg" style="width:842px;height:595px background-size: cover;">
                     <div class="cert_container_brdr" style="width:842px;height:595px">
                         <div class="cert_container_brdr_right" style="width:842px;height:595px">
@@ -51,7 +51,7 @@
                                     <p class="text-center fontBlack fontBold font14 mt-10" style="margin-top: 22px; margin-left:28px !important;">Credits: ${credits_text}</p>
                                 % endif
                                 <div class="sign_container" style="margin-left:23px !important;">
-                                    <p class="text-center fontMedium font14 fontBlack" style="margin-top:22px;">Certified by MasterHealthPro, India</p>
+                                    <p class="text-center fontMedium font14 fontBlack" style="margin-top:22px;">Certified by MasterHealthPro Inc., USA</p>
                                     <div class="cert_sign grid-center" style="width: 842px;display: -webkit-box;-webkit-box-pack: center;justify-content: center;">
                                         <div class="right_sign" style="width: 200px;max-width: 200px;text-align: center;">
                                             <img src="${static.url('images/SS_Vasan_Sign.png')}" />
@@ -69,39 +69,32 @@
                                 </div>
                                 <p class="text-center fontBlack fontMedium font14 mt-10" style="margin-left:28px !important;">In Association with</p>
                                 
-				<div style="display: -webkit-box;display: flex;-webkit-box-pack: center;justify-content: center;align-items: center;width:100%; margin-top: 10px;">
-                                    % if credits_text:
-                                        <div style="text-align: center;display: block;width: 190px;max-width: 190px; margin-left: 25px; margin-right: 0px;">
-                                            <img style="width:60px; height:80px; margin-top:2px; object-fit: contain;" src="${static.url('images/cpd logo.png')}" />
-
-                                            <p style="font-size: 7px; font-family: 'Montserrat-Regular', sans-serif !important; color: #4A494A; line-height: 1.5;">THE CPD STANDARDS, UK</p>
-                                            <p style="font-size: 7px; font-family: 'Montserrat-Regular', sans-serif !important; color: #4A494A; ">CPD PROVIDER, 50493</p>
-                                        </div>
-                                    % endif
-                                    <div style="text-align: center;display: block;width: 170px;max-width: 170px; margin-left: -20px; margin-right: 15px;">
+			                    <div style="display: -webkit-box;display: flex;-webkit-box-pack: center;justify-content: center;align-items: center;width: 100%;margin-left: 25px;margin-top: 10px;">
+                                    <div style="text-align: center;display: block;width: 130px;max-width: 130px; margin-left: 25px; margin-right: 0px;">
+                                        <img style="width:60px; height:80px; margin-top:2px; object-fit: contain;" src="${static.url('images/ima-ams.png')}" />
+                                            <p style="font-size: 7px; font-family: 'Montserrat-Regular', sans-serif !important; color: #4A494A; line-height: 1.5;">INDIAN MEDICAL ASSOCIATION</p>
+                                            <p style="font-size: 7px; font-family: 'Montserrat-Regular', sans-serif !important; color: #4A494A; ">ACADEMY OF MEDICAL SPECIALITIES</p>
+                                    </div>
+                                    <div style="text-align: center;display: block;width: 130px;max-width: 130px; margin-left: 25px; margin-right: 0px;">
+                                        <img style="width:60px; height:80px; margin-top:2px; object-fit: contain;" src="${static.url('images/ankur.png')}" />
+                                            <p style="font-size: 7px; font-family: 'Montserrat-Regular', sans-serif !important; color: #4A494A; line-height: 1.5;">ANKUR HEALTHCARE</p>
+                                    </div>
+                                    <div style="text-align: center;display: block;width: 130px;max-width: 130px; margin-left: 25px; margin-right: 0px;">
+                                        <img style="width:60px; height:80px; margin-top:2px; object-fit: contain;" src="${static.url('images/cpd logo.png')}" />
+                                        <p style="font-size: 7px; font-family: 'Montserrat-Regular', sans-serif !important; color: #4A494A; line-height: 1.5;">THE CPD STANDARDS, UK</p>
+                                        <p style="font-size: 7px; font-family: 'Montserrat-Regular', sans-serif !important; color: #4A494A; ">CPD PROVIDER, 50493</p>
+                                    </div>
+                                    <div style="text-align: center;display: block;width: 130px;max-width: 130px; margin-left: 25px; margin-right: 0px;">
                                         <img style="width:60px; height:80px; margin-top:3px; object-fit: contain;" src="${static.url('images/AFMH.png')}" />
-
                                             <p style="font-size: 7px; font-family: 'Montserrat-Regular', sans-serif !important; color: #4A494A; line-height: 1.5;">ACADEMY FOR MEN'S HEALTH</p>
                                             <p style="font-size: 7px; font-family: 'Montserrat-Regular', sans-serif !important; color: #4A494A; ">SINGAPORE</p>
-
                                     </div>
-                                    <div style="text-align: center;display: block;width: 190px;max-width: 190px;padding-top: 32px; margin-left: 0px; margin-right: 15px;">
-                                        <img class="asso_img_2" style="margin-top:5px" src="${static.url('images/isamh.png')}" />
-
-                                            <p style="font-size: 7px; font-family: 'Montserrat-Regular', sans-serif !important; color: #4A494A; line-height: 1.5;">INTERNATIONAL SOCIETY OF FERTILITY &</p>
-                                            <p style="font-size: 7px; font-family: 'Montserrat-Regular', sans-serif !important; color: #4A494A; ">REPRODUCTIVE HEALTH</p>
-
-                                    </div>
-                                    <div style="text-align: center;display: block;width: 160px;max-width: 160px;height: 107px; margin-left: 0px; margin-right: 8px;">
+                                    <div style="text-align: center;display: block;width: 130px;max-width: 130px; margin-left: 25px; margin-right: 0px;">
                                         <img class="asso_img_3" style="margin-top:1px" src="${static.url('images/sassm.png')}" />
-
                                             <p style="font-size: 7px; font-family: 'Montserrat-Regular', sans-serif !important; color: #4A494A; line-height: 1.5;">SOUTH ASIAN SOCIETY FOR</p>
                                             <p style="font-size: 7px; font-family: 'Montserrat-Regular', sans-serif !important; color: #4A494A; ">SEXUAL MEDICINE</p>
-
                                     </div>
                                 </div>
-
-
                                 <div class="verify" style="display: block;text-align: center;margin-top:18px !important; margin-left:45px !important;">
                                     <p class="font11 fontLBlack fontReg" style="font-size:10px;">Verify the certificate at:
                                         <a class="font11 fontReg fontBlue" href="${accomplishment_verify_url}" style="font-size:10px;">${accomplishment_verify_url}</a>

@@ -66,17 +66,16 @@
         }
         .cert_container {
             width: 1075px;
-            background: url("${static.url('images/Certificate-MHPro-Proficiency-02.png')}") no-repeat padding-box;
+            background: url("${static.url('images/MHPro-CERTIFICATE OF POST GRADUATION 1-01.png')}") no-repeat padding-box;
             background-size: contain;
             height: 100%;
         }
 
         .cert_container_bg {
-            background: url("${static.url('images/Certificate-MHPro-Proficiency-03.png')}") no-repeat padding-box;
+            background: url("${static.url('images/MHPro-CERTIFICATE OF POST GRADUATION - 2-01.png')}") no-repeat padding-box;
             background-size: contain;
             height: 100%;
         }
-
         .cert_container_brdr {
             background-size: contain;
             height: 100%;
@@ -105,16 +104,16 @@
             display: flex;
             justify-content: space-evenly;
             align-items: end;
-	    margin-top: 10px;
+        margin-top: 10px;
 
         }
-	
-	.asso_icon{
-		max-height: 80px;
- 	      	width: 80px;
-		object-fit: contain;
- 		justify-self: center;
-	}
+    
+    .asso_icon{
+        max-height: 80px;
+            width: 80px;
+        object-fit: contain;
+        justify-self: center;
+    }
 
         .grid-center {
             display: flex;
@@ -235,12 +234,12 @@
         }
 
        /*p.fontR7 {
-	    color: #4A494A;
-	    font-family: Montserrat;
-	    font-size: 7px;
-	}*/
+        color: #4A494A;
+        font-family: Montserrat;
+        font-size: 7px;
+    }*/
 
-	p.fontR7 {
+    p.fontR7 {
     color: #4A494A !important;
    /* font-family: Montserrat !important;*/
     font-family: Montserrat !important;
@@ -326,7 +325,7 @@
         }
 
         .sign_container {
-            min-height: 140px;
+            min-height: 115px;
         }
 
         .mt-30 {
@@ -550,17 +549,17 @@
             box-shadow: none;
             background-image: none;
         }
-	.cert_desc > div{
-		display: grid;
-		justify-content: center;
-	  	align-items: center;
-	}
-	.sec_txt{
-		line-height: 6px;
-	}
-	.asso_img_end{
-		width: 115px !important;
-	}
+    .cert_desc > div{
+        display: grid;
+        justify-content: center;
+        align-items: center;
+    }
+    .sec_txt{
+        line-height: 6px;
+    }
+    .asso_img_end{
+        width: 115px !important;
+    }
 
     </style>
 </%block>
@@ -598,11 +597,11 @@
                                 </p>
                             </div>
                         </div>
+                        <p class="text-center fontBlack fontBold font14" style="margin-top: 22px;">Course Duration: 1 Year</p>
                         % if credits_text:
-                            <p class="text-center fontBlack fontBold font14 mt-10" style="margin-top: 22px;">Credits: ${credits_text}</p>
+                            <p class="text-center fontBlack fontBold font14 mt-10">Credits: ${credits_text}</p>
                         % endif
                         <div class="sign_container">
-                            <p class="text-center fontMedium font14 fontBlack" style="margin-top:22px;">Certified by MasterHealthPro, India</p>
                             <div class="cert_sign grid-center">
                                 <div class="right_sign">
                                     <img src="${static.url('images/SS_Vasan_Sign.png')}" />
@@ -619,42 +618,40 @@
                             </div>
                         </div>
                         <p class="text-center fontBlack fontMedium font14 mt-10">In Association with</p>
-			<!--<div class="cert_desc flex-center ">-->
-			<div class="cert_desc ${'cert_desc_four' if credits_text else 'cert_desc_three'} flex-center">
-                            % if credits_text:
+                        <div class="cert_desc ${'cert_desc_four' if credits_text else 'cert_desc_three'} flex-center">
+                            <div>
+                                <img class="asso_img_1 asso_icon" src="${static.url('images/ima-ams.png')}" />
+                                <p class="fontR7 text-center">INDIAN MEDICAL ASSOCIATION</p>
+                                <p class="fontR7 text-center sec_txt">ACADEMY OF MEDICAL SPECIALITIES</p>
+                            </div>
+                            <div>
+                                <img class="asso_img_1 asso_icon" src="${static.url('images/ankur.png')}" />
+                                <p class="fontR7 text-center">ANKUR HEALTHCARE</p>
+                            </div>
+                            <div>
+                                <img class="asso_img_1 asso_icon" src="${static.url('images/cpd logo.png')}" />
                                 <div>
-                                    <img class="asso_img_1 asso_icon" src="${static.url('images/cpd logo.png')}" />
-                                    <div>
                                     <p class="fontR7 text-center">THE CPD STANDARDS, UK</p>
                                     <p class="fontR7 text-center sec_txt">CPD PROVIDER, 50493</p>
-				    </div>
-				</div>
-                            % endif
-                            <div>
-                                <img class="asso_img_1 asso_icon" src="${static.url('images/AFMH.png')}" />
-                                <div>
                                 </div>
-                                <p class="fontR7 text-center">ACADEMY FOR MEN'S HEALTH</p>
-                                <p class="fontR7 text-center sec_txt">SINGAPORE</p>
                             </div>
                             <div>
-                                <img class="asso_img_3 asso_icon" src="${static.url('images/isamh.png')}" />
-				<div></div>
-                                <p class="fontR7 text-center">INTERNATIONAL SOCIETY OF FERTILITY &</p>
-                                <p class="fontR7 text-center sec_txt">REPRODUCTIVE HEALTH, NETHERLANDS</p>
-                            </div>
-                            <div>
-                                <img class="asso_img_end sso_icon" src="${static.url('images/sassm.png')}" />
+                                <img class="asso_img_1 sso_icon" src="${static.url('images/sassm.png')}" />
                                 <div>
                                     <p class="fontR7 text-center">SOUTH ASIAN SOCIETY FOR</p>
                                     <p class="fontR7 text-center sec_txt">SEXUAL MEDICINE</p>
-				</div>
+                                </div>
+                            </div>
+                            <div>
+                                <img class="asso_img_1 asso_icon" src="${static.url('images/AFMH.png')}" />
+                                <p class="fontR7 text-center">ACADEMY FOR MEN'S HEALTH</p>
+                                <p class="fontR7 text-center sec_txt">SINGAPORE</p>
                             </div>
                         </div>
                         <div class="verify" style="margin-top:30px !important">
                             <p class="font11 fontLBlack fontReg" style="font-size:10px;">Verify the certificate at:
                                 <a class="font11 fontReg fontBlue" href="${accomplishment_verify_url}">${accomplishment_verify_url}</a>
-			    </p>
+                            </p>
                         </div>
                     </div>
                 </div>

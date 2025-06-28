@@ -1,0 +1,20 @@
+## mako
+<%! from django.utils.translation import gettext as _ %>
+${_("Dear Doctor,")}
+
+${_("Congratulations on taking the first step toward advancing your career in this ever-growing field!")}
+
+${_("You have successfully registered for the IMA AMS Fellowship in Andrology & Sexual Medicine, a first-of-its-kind program designed to enhance clinical knowledge and skills in male reproductive and sexual health.")}
+
+${_("This prestigious fellowship is a joint initiative by the Indian Medical Association – Academy of Medical Specialities (IMA AMS) and MasterHealthPro, in association with Ankur Healthcare, offering a comprehensive, multidisciplinary approach to Andrology and Sexual Medicine.")}
+
+% if is_new_user:
+${_("Click the link below to activate your account")}
+
+${account_activation_link}
+
+% endif
+${_("For any assistance regarding course details or the next steps for enrollment, please feel free to contact us at: sales@masterhealthpro.com")}
+
+${_("We look forward to supporting you on your learning journey.")}
+${_("The {platform_name} Team").format(platform_name=platform_name)}

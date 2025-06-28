@@ -250,6 +250,8 @@ def generate_course_cert_pdf(certificate_id):
             template = "certificates/pg_course_certificate_for_pdf.html"
         elif course.certificate_template == "women_health_course_certificate":
             template = "certificates/women_health_course_certificate_for_pdf.html"
+        elif course.certificate_template == "ima_course_certificate":
+            template = "certificates/ima_course_certificate_for_pdf.html"
         else:
             template = "certificates/certificate_for_pdf.html"
 

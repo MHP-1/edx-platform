@@ -1,0 +1,15 @@
+## mako
+<%! from django.utils.translation import gettext as _ %>
+${_("Dear Sales Team,")}
+
+${_("A new inquiry has been submitted for course registration. Please find the details below:")}
+
+${_("Name: {}.").format(enquiry.name)}
+${_("Email: {}.").format(enquiry.email)}
+${_("Phone Number: {}.").format(enquiry.number)}
+${_("Course Name: {name}.").format(name=enquiry.course_name)}
+
+${_("Please follow up with the user at your earliest convenience to assist with their enrollment.")}
+
+${_("The {platform_name} Team").format(platform_name=platform_name)}
+${_("Thank you,")}
