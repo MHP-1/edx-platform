@@ -252,6 +252,8 @@ def generate_course_cert_pdf(certificate_id):
             template = "certificates/women_health_course_certificate_for_pdf.html"
         elif course.certificate_template == "ima_course_certificate":
             template = "certificates/ima_course_certificate_for_pdf.html"
+        elif course.certificate_template == "cosmetic_gynecology_&_sexology":
+            template = "certificates/cosmetic_gynecology_&_sexology_course_certificate_for_pdf.html"
         else:
             template = "certificates/certificate_for_pdf.html"
 
