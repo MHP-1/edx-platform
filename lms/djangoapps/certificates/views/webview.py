@@ -342,7 +342,7 @@ def _update_context_with_user_info(request, context, user, user_certificate):
     context["accomplishment_certificate_download"] = user_certificate.download_url
     context["accomplishment_certificate_image"] = user_certificate.image_url
     context["accomplishment_certificate_share_image"] = user_certificate.share_image_url
-    course_manage = CourseManage.objects.get(course_id=user_certificate.course_id)
+    course_manage = CourseManage.objects.get(course_id=context.get("course_id"))
     context["accomplishment_cert_date"] = user_certificate.modified_date.strftime(
         "%d-%m-%Y"
     )
@@ -354,9 +354,9 @@ def _update_context_with_user_info(request, context, user, user_certificate):
     context["accomplishment_course_image"] = course_manage.course.course_image_url
     context["disable_cookie_banner"] = True
     if course_manage.certificate_type == "progress-based":
-        passing_date = CourseProgress.get_passing_date(user, user_certificate.course_id)
+        passing_date = CourseProgress.get_passing_date(user, context.get("course_id"))
     else:
-        passing_date = LeaderBoard.get_passing_date(user, user_certificate.course_id)
+        passing_date = LeaderBoard.get_passing_date(user, context.get("course_id"))
     context["accomplishment_verify_url"] = request.build_absolute_uri(
         reverse(
             "certificates:render_cert_by_uuid",
@@ -368,7 +368,7 @@ def _update_context_with_user_info(request, context, user, user_certificate):
 
     context["accomplishment_course_type"] = course_manage.difficulty.name
     context["credits_text"] = course_manage.credits
-    course_type_text = CourseManage.get_course_type(user_certificate.course_id)
+    course_type_text = CourseManage.get_course_type(context.get("course_id"))
     context["accomplishment_course_type_text"] = (
         course_type_text if course_type_text else "Configure Course Type"
     )
