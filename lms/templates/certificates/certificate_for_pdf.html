@@ -23,6 +23,11 @@
         <link rel="icon" type="image/x-icon" href="${static.url('images/fav_icon.png')}"/>
         <link rel="stylesheet" href="${static.url('custom_css/pdf_certificate.css')}" />
         <title>${accomplishment_course_type_text} </title>
+        <style type="text/css">
+            .cert_desc>div{
+                padding-left: 25px;
+            }
+        </style>
     </head>
     <body style="margin: 0; height: 100%;">
         <main style="width: 100%;display: flex; gap: 25px;grid-template-columns: 1fr 1fr;justify-content: center;align-items: flex-start; height: 100%;">
@@ -85,13 +90,15 @@
                                             <p style="font-size: 7px; font-family: 'Montserrat-Regular', sans-serif !important; color: #4A494A; ">SINGAPORE</p>
 
                                     </div>
-                                    <div style="text-align: center;display: block;width: 190px;max-width: 190px;padding-top: 32px; margin-left: 0px; margin-right: 15px;">
+                                    <!--
+				    <div style="text-align: center;display: block;width: 190px;max-width: 190px;padding-top: 32px; margin-left: 0px; margin-right: 15px;">
                                         <img class="asso_img_2" style="margin-top:5px" src="${static.url('images/isamh.png')}" />
 
                                             <p style="font-size: 7px; font-family: 'Montserrat-Regular', sans-serif !important; color: #4A494A; line-height: 1.5;">INTERNATIONAL SOCIETY OF FERTILITY &</p>
                                             <p style="font-size: 7px; font-family: 'Montserrat-Regular', sans-serif !important; color: #4A494A; ">REPRODUCTIVE HEALTH</p>
 
                                     </div>
+				    -->
                                     <div style="text-align: center;display: block;width: 160px;max-width: 160px;height: 107px; margin-left: 0px; margin-right: 8px;">
                                         <img class="asso_img_3" style="margin-top:1px" src="${static.url('images/sassm.png')}" />
 
