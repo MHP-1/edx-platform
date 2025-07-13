@@ -206,6 +206,9 @@ class CourseDetailSerializer(CourseSerializer):  # pylint: disable=abstract-meth
                 User = get_user_model()
                 requested_user = User.objects.get(username=requested_username)
                 response['is_enrolled'] = CourseEnrollment.is_enrolled(requested_user, instance.id)
+        # Added by Developer
+        else:
+            response['is_enrolled'] = False
         return response
 
 

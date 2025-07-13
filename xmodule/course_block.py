@@ -1130,6 +1130,12 @@ class CourseFields:  # lint-amnesty, pylint: disable=missing-class-docstring
         scope=Scope.settings
     )
     coming_soon_date = Date(help=_("Course coming soon date"), scope=Scope.settings)
+    course_tags = String(
+        display_name=_("Course Tags"),
+        help=_("Select tags for the course."),
+        default='',
+        scope=Scope.settings
+    )
 
 class CourseBlock(
     CourseFields,

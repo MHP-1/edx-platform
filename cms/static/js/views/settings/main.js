@@ -23,7 +23,8 @@ function(ValidatingView, CodeMirror, _, $, ui, DateUtils, FileUploadModel,
             'blur :input': 'inputUnfocus',
             'click .action-upload-image': 'uploadImage',
             'click .add-course-learning-info': 'addLearningFields',
-            'click .add-course-instructor-info': 'addInstructorFields'
+            'click .add-course-instructor-info': 'addInstructorFields',
+            'change select#course_tags': 'addCourseTags',
         },
 
         initialize: function(options) {
@@ -47,6 +48,7 @@ function(ValidatingView, CodeMirror, _, $, ui, DateUtils, FileUploadModel,
             this.$el.find('#certificate_type').val(this.model.get('certificate_type'));
             this.$el.find('#passing_progress').val(this.model.get('passing_progress'));
             this.$el.find('#metadata_description').val(this.model.get('metadata_description'));
+            this.$el.find('#course_tags').val(this.safeJSONParse(this.model.get('course_tags'))).trigger("chosen:updated");
 
             this.updateCertificatesDisplayBehavior();
 
@@ -184,6 +186,7 @@ function(ValidatingView, CodeMirror, _, $, ui, DateUtils, FileUploadModel,
             this.$el.find('#' + this.fieldToSelectorMap['course_slug_data']).val(this.model.get('course_slug_data'));
             this.$el.find('#' + this.fieldToSelectorMap['certificate_type']).val(this.model.get('certificate_type'));
             this.$el.find('#' + this.fieldToSelectorMap['passing_progress']).val(this.model.get('passing_progress'));
+            this.$el.find('#' + this.fieldToSelectorMap['course_tags']).val(this.safeJSONParse(this.model.get('course_tags'))).trigger("chosen:updated");
             this.$el.find('#' + this.fieldToSelectorMap['metadata_description']).val(this.model.get('metadata_description'));
             if (this.model.get('subscription_enabled') == 'true') {
                this.$('#' + this.fieldToSelectorMap.subscription_enabled).attr('checked', this.model.get('subscription_enabled'));
@@ -233,7 +236,8 @@ function(ValidatingView, CodeMirror, _, $, ui, DateUtils, FileUploadModel,
             certificate_type: 'certificate_type',
             passing_progress: 'passing_progress',
             metadata_description: 'metadata_description',
-            coming_soon_date: 'coming-soon'
+            coming_soon_date: 'coming-soon',
+            course_tags: 'course_tags',
         },
 
         addLearningFields: function() {
@@ -259,7 +263,10 @@ function(ValidatingView, CodeMirror, _, $, ui, DateUtils, FileUploadModel,
             });
             this.model.set('instructor_info', {instructors: instructors});
         },
-
+        addCourseTags: function() {
+           var topics = $("#course_tags").val();
+           this.model.set('course_tags', JSON.stringify(topics));
+        },
         updateTime: function(e) {
             var now = new Date(),
                 hours = now.getUTCHours(),
@@ -373,6 +380,7 @@ function(ValidatingView, CodeMirror, _, $, ui, DateUtils, FileUploadModel,
             case 'passing_progress':
             case 'metadata_description':
             case 'subscription_enabled':
+            case 'course_tags':
             case 'course-short-description':
                 this.setField(event);
                 break;
@@ -503,7 +511,13 @@ function(ValidatingView, CodeMirror, _, $, ui, DateUtils, FileUploadModel,
                 _.bind(this.saveView, this),
                 _.bind(this.revertView, this));
         },
-
+        safeJSONParse: function(value) {
+            try {
+                return JSON.parse(value);
+            } catch (e) {
+                return [];
+            }
+        },
         uploadImage: function(event) {
             event.preventDefault();
             var title = '',

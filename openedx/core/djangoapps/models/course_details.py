@@ -42,6 +42,7 @@ ABOUT_ATTRIBUTES = [
     'course_slug_data',
     'certificate_type',
     'passing_progress',
+    'course_tags'
 ]
 
 
@@ -101,6 +102,7 @@ class CourseDetails:
         self.certificate_type = ""
         self.passing_progress = ""
         self.coming_soon_date = None
+        self.course_tags = ""
 
     @classmethod
     def fetch_about_attribute(cls, course_key, attribute):
@@ -166,6 +168,7 @@ class CourseDetails:
         course_details.coming_soon_date = getattr(block, 'coming_soon_date', None)
         course_details.certificate_type = block.certificate_type
         course_details.passing_progress = block.passing_progress
+        course_details.course_tags = block.course_tags
 
         # Default course license is "All Rights Reserved"
         course_details.license = getattr(block, "license", "all-rights-reserved")
