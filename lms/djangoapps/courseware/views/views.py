@@ -9,8 +9,7 @@ import urllib
 from collections import OrderedDict, namedtuple
 from datetime import datetime
 import six
-from urllib.parse import quote_plus, urlencode, urljoin, urlparse, urlunparse
-
+from urllib.parse import quote_plus, urlencode, urljoin, urlparse, urlunparse, quote
 import nh3
 import requests
 from django.conf import settings
@@ -1036,9 +1035,8 @@ def course_about_with_slug(request, slug_id):
             cart.delete()
             in_cart = False
 
-        reg_then_add_to_cart_link = "{reg_url}?course_id={course_id}&enrollment_action=add_to_cart".format(
-            reg_url=reverse('signin_user'), course_id=(str(course_id))
-        )
+        next_url_encoded = quote(reverse("about_course", args=[str(course.id)]))
+        reg_then_add_to_cart_link = "/login?next={}".format(next_url_encoded)
         context = {
             'course': course,
             'course_details': course_details,
