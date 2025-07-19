@@ -81,7 +81,17 @@ class GeneratedCertificateAdmin(admin.ModelAdmin):
     raw_id_fields = ('user',)
     show_full_result_count = False
     search_fields = ('course_id', 'user__username')
-    list_display = ('id', 'course_id', 'mode', 'user')
+    list_display = ('id', 'course_id', 'get_display_name', 'mode', 'user')
+
+    def get_display_name(self, instance):
+        try:
+            from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
+            course_overview = CourseOverview.get_from_id(instance.course_id)
+            return course_overview.display_name
+        except Exception as e:
+            return ""
+
+    get_display_name.short_description = "Display Name"
 
 
 class CertificateGenerationCourseSettingAdmin(admin.ModelAdmin):

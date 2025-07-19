@@ -272,12 +272,12 @@
                 }
             ];
 
-            if (enableCoppaCompliance) {
-                yearOfBirthViewIndex = aboutSectionsData[1].fields.findIndex(function(field) {
-                    return field.view.options.valueAttribute === 'year_of_birth';
-                });
-                aboutSectionsData[1].fields.splice(yearOfBirthViewIndex, 1);
-            }
+            // if (enableCoppaCompliance) {
+            //     yearOfBirthViewIndex = aboutSectionsData[1].fields.findIndex(function(field) {
+            //         return field.view.options.valueAttribute === 'year_of_birth';
+            //     });
+            //     aboutSectionsData[1].fields.splice(yearOfBirthViewIndex, 1);
+            // }
 
             // Secondary email address
             if (isSecondaryEmailFeatureEnabled) {
@@ -336,7 +336,7 @@
             // Add the social link fields
             socialFields = {
                 title: gettext('Social Media Links'),
-                subtitle: gettext('OOptionally, link your personal accounts to the social media icons on your MasterHealthPro profile.'), // eslint-disable-line max-len
+                subtitle: gettext('Optionally, link your personal accounts to the social media icons on your MasterHealthPro profile.'), // eslint-disable-line max-len
                 fields: []
             };
 
