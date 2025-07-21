@@ -366,7 +366,7 @@ def _update_context_with_user_info(request, context, user, user_certificate):
     if passing_date:
         context["accomplishment_cert_date"] = passing_date.strftime("%d-%m-%Y")
 
-    context["accomplishment_course_type"] = course_manage.difficulty.name
+    context["accomplishment_course_type"] = course_manage.course_type.name
     context["credits_text"] = course_manage.credits
     course_type_text = CourseManage.get_course_type(user_certificate.course_id)
     context["accomplishment_course_type_text"] = (
