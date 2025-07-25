@@ -98,9 +98,19 @@ class CertificateGenerationCourseSettingAdmin(admin.ModelAdmin):
     """
     Django admin customizations for CertificateGenerationCourseSetting model
     """
-    list_display = ('course_key', 'self_generation_enabled', 'language_specific_templates_enabled')
+    list_display = ('course_key', 'get_display_name', 'self_generation_enabled', 'language_specific_templates_enabled')
     search_fields = ('course_key',)
     show_full_result_count = False
+
+    def get_display_name(self, instance):
+        try:
+            from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
+            course_overview = CourseOverview.get_from_id(instance.course_key)
+            return course_overview.display_name
+        except Exception as e:
+            return ""
+
+    get_display_name.short_description = "Display Name"
 
 
 @admin.register(ModifiedCertificateTemplateCommandConfiguration)
