@@ -501,7 +501,7 @@ class RegistrationFormFactory:
         """
         # Translators: This label appears above a field on the registration form
         # meant to hold the user's email address.
-        email_label = _("Email")
+        email_label = _("Email Address")
 
         # Translators: These instructions appear on the registration form, immediately
         # below a field meant to hold the user's email address.
@@ -551,7 +551,7 @@ class RegistrationFormFactory:
         """
         # Translators: This label appears above a field on the registration form
         # meant to hold the user's full name.
-        name_label = _("Name")
+        name_label = _("Full Name")
 
         # Translators: These instructions appear on the registration form, immediately
         # below a field meant to hold the user's full name.
@@ -576,7 +576,7 @@ class RegistrationFormFactory:
         """
         # Translators: This label appears above a field on the registration form
         # meant to hold the user's public username.
-        username_label = _("Username")
+        username_label = _("Public Username")
 
         username_instructions = _(
             # Translators: These instructions appear on the registration form, immediately
