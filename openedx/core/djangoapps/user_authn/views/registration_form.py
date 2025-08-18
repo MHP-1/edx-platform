@@ -551,7 +551,7 @@ class RegistrationFormFactory:
         """
         # Translators: This label appears above a field on the registration form
         # meant to hold the user's full name.
-        name_label = _("Name")
+        name_label = _("Profile Name")
 
         # Translators: These instructions appear on the registration form, immediately
         # below a field meant to hold the user's full name.

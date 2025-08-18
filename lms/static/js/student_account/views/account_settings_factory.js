@@ -100,7 +100,7 @@
 
             fullNameFieldData = {
                 model: userAccountModel,
-                title: gettext('Name'),
+                title: gettext('Profile Name'),
                 valueAttribute: 'name',
                 helpMessage: gettext('The name that is used for ID verification and that appears on your certificates.'), // eslint-disable-line max-len,
                 persistChanges: true
