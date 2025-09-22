@@ -42,6 +42,7 @@
                 // Destroy the view (but not el) and unbind events
                 this.$el.empty().off();
                 this.stopListening();
+                $('#login-anchor').show();
             }
         });
     });
