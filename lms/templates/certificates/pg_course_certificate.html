@@ -105,16 +105,8 @@
             display: flex;
             justify-content: space-evenly;
             align-items: end;
-	    margin-top: 10px;
-
+	    margin-top: 10px
         }
-	
-	.asso_icon{
-		max-height: 80px;
- 	      	width: 80px;
-		object-fit: contain;
- 		justify-self: center;
-	}
 
         .grid-center {
             display: flex;
@@ -234,19 +226,6 @@
             color: #303030;
         }
 
-       /*p.fontR7 {
-	    color: #4A494A;
-	    font-family: Montserrat;
-	    font-size: 7px;
-	}*/
-
-	p.fontR7 {
-    color: #4A494A !important;
-   /* font-family: Montserrat !important;*/
-    font-family: Montserrat !important;
-    font-size: 7px !important;
-}
-
         .vibes {
             margin: 0px 2px;
             border-bottom: 1px dotted var(--fontColor);
@@ -279,39 +258,33 @@
             text-align: center;
         }
 
+        
 
-.cert_desc > div {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-}
+        
 
-.cert_desc_three > div {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-}
+        .cert_desc>div {
+            display: grid;
+            justify-content: center;
+            align-items: center;
+            grid-template-columns: 1fr;
+        }
+	.last_chld{
+		margin-left:5px;
+	}
 
+        .cert_desc img {
+            max-height: 80px;
+            width: 80px;
+            object-fit: contain;
+            justify-self: center;
+        }
 
-    /* For 4 icons */
-    .cert_desc_four {
-        display: flex;
-        justify-content: space-evenly;
-    }
-
-
-    /* Adjust individual icon styling if needed */
-    .cert_desc img {
-        max-height: 80px;
-        width: 80px;
-        object-fit: contain;
-    }
         .asso_img_2 {
             width: 175px !important;
         }
 
         .asso_img_3 {
-            width: 175px !important;
+            width: 115px !important;
         }
 
         .center {
@@ -550,33 +523,39 @@
             box-shadow: none;
             background-image: none;
         }
-	.cert_desc > div{
-		display: grid;
-		justify-content: center;
-	  	align-items: center;
-	}
-	.sec_txt{
-		line-height: 6px;
-	}
-	.asso_img_end{
-		width: 115px !important;
-	}
 
     </style>
 </%block>
 <%block name="pagetitle">
     ${accomplishment_course_type_text}
 </%block>
+<style type="text/css">
+    .cert_container {
+        width: 1075px;
+        background: url("${static.url('images/MHPro-CERTIFICATE OF POST GRADUATION 1-01.png')}") no-repeat padding-box;
+        background-size: contain;
+        height: 100%;
+    }
+
+    .cert_container_bg {
+        background: url("${static.url('images/MHPro-CERTIFICATE OF POST GRADUATION - 2-01.png')}") no-repeat padding-box;
+        background-size: contain;
+        height: 100%;
+    }
+    .sec_txt{
+	    line-height: 6px;
+    }
+</style>
 <main style="width: 100%;display: flex; gap: 25px;grid-template-columns: 1fr 1fr;justify-content: center;align-items: flex-start;">
     
-    <div class="cert_container " style="width:908px;height:640px">
+    <div class="cert_container" style="width:908px;height:640px">
         <div class="cert_container_bg">
             <div class="cert_container_brdr">
                 <div class="cert_container_brdr_right">
                     <div class="cert_content_pad">
                         <div class="cert_logo mt-10">
                             <div class="cert_header" style="padding:0px;">
-                                <img src="${static.url('images/logo.png')}" />
+                                <img src="${static.url('images/logo')}" />
                             </div>
                         </div>
                         <h2 class="text-center montHeader" style="text-transform: uppercase;">
@@ -611,6 +590,9 @@
                                         <p class="fontBlack font600 font10">Program Director</p>
                                     </div>
                                 </div>
+                                <div class="right_sign" style="width: 100px;max-width: 100px;text-align: center;">
+                                    <img src="${static.url('images/MHPro-CERTIFICATE OF POST GRADUATION - 3-01.png')}" style="height: 100%;" />
+                                </div>
                                 <div class="right_sign">
                                     <img src="${static.url('images/Suresh_Elangovan_Sign.png')}" style="margin-top:10px;" />
                                     <p class="fontBlack font600 font10">Suresh Elangovan</p>
@@ -618,43 +600,39 @@
                                 </div>
                             </div>
                         </div>
-                        <p class="text-center fontBlack fontMedium font14 mt-10">In Association with</p>
-			<!--<div class="cert_desc flex-center ">-->
-			<div class="cert_desc ${'cert_desc_four' if credits_text else 'cert_desc_three'} flex-center">
+                        <p class="text-center fontBlack fontMedium font14 mt-10 mb-10">In Association with</p>
+                        <div class="cert_desc flex-center">
                             % if credits_text:
                                 <div>
-                                    <img class="asso_img_1 asso_icon" src="${static.url('images/cpd logo.png')}" />
-                                    <div>
-                                    <p class="fontR7 text-center">THE CPD STANDARDS, UK</p>
-                                    <p class="fontR7 text-center sec_txt">CPD PROVIDER, 50493</p>
-				    </div>
-				</div>
+                                    <img class="asso_img_1" src="${static.url('images/cpd logo.png')}" />
+                                    <p class="font7 fontMonsRegular text-center">THE CPD STANDARDS, UK</p>
+                                    <p class="font7 fontMonsRegular text-center sec_txt">CPD PROVIDER, 50493</p>
+                                </div>
                             % endif
                             <div>
-                                <img class="asso_img_1 asso_icon" src="${static.url('images/AFMH.png')}" />
+                                <img class="asso_img_1" src="${static.url('images/AFMH.png')}" />
+                                <p class="font7 fontMonsRegular text-center">ACADEMY FOR MEN'S HEALTH</p>
+                                <p class="font7 fontMonsRegular text-center sec_txt">SINGAPORE</p>
+                            </div>
+                            <div>
+                                <img class="asso_img_2" src="${static.url('images/isamh.png')}" />
                                 <div>
+                                   <p class="font7 fontMonsRegular text-center">INTERNATIONAL SOCIETY OF FERTILITY</p>
+                                    <p class="font7 fontMonsRegular text-center sec_txt">& REPRODUCTIVE HEALTH, NETHERLANDS</p>
                                 </div>
-                                <p class="fontR7 text-center">ACADEMY FOR MEN'S HEALTH</p>
-                                <p class="fontR7 text-center sec_txt">SINGAPORE</p>
                             </div>
-                            <div>
-                                <img class="asso_img_3 asso_icon" src="${static.url('images/isamh.png')}" />
-				<div></div>
-                                <p class="fontR7 text-center">INTERNATIONAL SOCIETY OF FERTILITY &</p>
-                                <p class="fontR7 text-center sec_txt">REPRODUCTIVE HEALTH, NETHERLANDS</p>
-                            </div>
-                            <div>
-                                <img class="asso_img_end sso_icon" src="${static.url('images/sassm.png')}" />
+                            <div class="last_chld">
+                                <img class="asso_img_3" src="${static.url('images/sassm.png')}" />
                                 <div>
-                                    <p class="fontR7 text-center">SOUTH ASIAN SOCIETY FOR</p>
-                                    <p class="fontR7 text-center sec_txt">SEXUAL MEDICINE</p>
-				</div>
+                                    <p class="font7 fontMonsRegular text-center">SOUTH ASIAN SOCIETY FOR</p>
+                                    <p class="font7 fontMonsRegular text-center sec_txt">SEXUAL MEDICINE</p>
+                                </div>
                             </div>
                         </div>
                         <div class="verify" style="margin-top:30px !important">
                             <p class="font11 fontLBlack fontReg" style="font-size:10px;">Verify the certificate at:
                                 <a class="font11 fontReg fontBlue" href="${accomplishment_verify_url}">${accomplishment_verify_url}</a>
-			    </p>
+                            </p>
                         </div>
                     </div>
                 </div>
