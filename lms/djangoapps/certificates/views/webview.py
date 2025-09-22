@@ -504,6 +504,8 @@ def render_cert_by_uuid(request, certificate_uuid):
             template = "certificates/pg_course_certificate.html"
         elif course.certificate_template == "women_health_course_certificate":
             template = "certificates/women_health_course_certificate.html"
+        elif course.certificate_template == "dental_science_certificate":
+            template = "certificates/dental_science_certificate.html"
         else:
             template = "certificates/valid.html"
         return render_html_view(
@@ -526,6 +528,8 @@ def render_pdf_cert_by_uuid(request, certificate_uuid):
             template = "certificates/pg_course_certificate_for_pdf.html"
         elif course.certificate_template == "women_health_course_certificate":
             template = "certificates/women_health_course_certificate_for_pdf.html"
+        elif course.certificate_template == "dental_science_certificate":
+            template = "certificates/dental_science_certificate_for_pdf.html"
         else:
             template = "certificates/certificate_for_pdf.html"
 
