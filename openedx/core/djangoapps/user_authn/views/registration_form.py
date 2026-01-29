@@ -1129,21 +1129,13 @@ class RegistrationFormFactory:
 
         # Translators: "Terms of service" is a legal document users must agree to
         # in order to register a new account.
-        label = Text(_("I agree to the {platform_name} {tos_link_start}{terms_of_service}{tos_link_end}")).format(
-            platform_name=configuration_helpers.get_value("PLATFORM_NAME", settings.PLATFORM_NAME),
-            terms_of_service=terms_label,
-            tos_link_start=HTML("<a href='{terms_link}' rel='noopener' target='_blank'>").format(
-                terms_link=terms_link
-            ),
-            tos_link_end=HTML("</a>"),
+        label = Text(_("I agree that {platform_name} may contact me about my inquiry.")).format(
+            platform_name=configuration_helpers.get_value("PLATFORM_NAME", settings.PLATFORM_NAME)
         )
 
         # Translators: "Terms of service" is a legal document users must agree to
         # in order to register a new account.
-        error_msg = _("You must agree to the {platform_name} {terms_of_service}").format(
-            platform_name=configuration_helpers.get_value("PLATFORM_NAME", settings.PLATFORM_NAME),
-            terms_of_service=terms_label
-        )
+        error_msg = _("You must consent to being contacted in relation to your inquiry.")
 
         form_desc.add_field(
             "terms_of_service",
