@@ -295,6 +295,7 @@ def courses(request):
     """
     Render "find courses" page.  The course selection work is done in courseware.courses.
     """
+    return redirect('/programs')
     courses_list = []
     course_discovery_meanings = getattr(settings, 'COURSE_DISCOVERY_MEANINGS', {})
     set_default_filter = ENABLE_COURSE_DISCOVERY_DEFAULT_LANGUAGE_FILTER.is_enabled()
