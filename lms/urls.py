@@ -369,7 +369,7 @@ urlpatterns += [
     ),
     # Added by Developer
     re_path(
-        r'^courses/(?P<slug_id>[-\w]+)/$',
+        r'^programs/(?P<slug_id>[-\w]+)/$',
         courseware_views.course_about_with_slug,
         name='about_course_with_slug',
     ),
