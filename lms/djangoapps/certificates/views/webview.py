@@ -518,6 +518,8 @@ def render_cert_by_uuid(request, certificate_uuid):
             template = "certificates/basic_skin_aesthetics_course_certificate.html"
         elif course.certificate_template == "aesthetic_medicine_&_dermatology":
             template = "certificates/aesthetic_medicine_&_dermatology_course_certificate.html"
+        elif course.certificate_template == "dbima_course_certificate":
+            template = "certificates/dbima_course_certificate.html"
         else:
             template = "certificates/valid.html"
         return render_html_view(
@@ -554,6 +556,8 @@ def render_pdf_cert_by_uuid(request, certificate_uuid):
             template = "certificates/basic_skin_aesthetics_course_certificate_for_pdf.html"
         elif course.certificate_template == "aesthetic_medicine_&_dermatology":
             template = "certificates/aesthetic_medicine_&_dermatology_course_certificate_for_pdf.html"
+        elif course.certificate_template == "dbima_course_certificate":
+            template = "certificates/dbima_course_certificate_for_pdf.html"
         else:
             template = "certificates/certificate_for_pdf.html"
 

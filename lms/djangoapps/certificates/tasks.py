@@ -264,6 +264,8 @@ def generate_course_cert_pdf(certificate_id):
             template = "certificates/basic_skin_aesthetics_course_certificate_for_pdf.html"
         elif course.certificate_template == "aesthetic_medicine_&_dermatology":
             template = "certificates/aesthetic_medicine_&_dermatology_course_certificate_for_pdf.html"
+        elif course.certificate_template == "dbima_course_certificate":
+            template = "certificates/dbima_course_certificate_for_pdf.html"
         else:
             template = "certificates/certificate_for_pdf.html"
 
