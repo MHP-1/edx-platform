@@ -47,6 +47,10 @@ function(ValidatingView, CodeMirror, _, $, ui, DateUtils, FileUploadModel,
             this.$el.find('#certificate_type').val(this.model.get('certificate_type'));
             this.$el.find('#passing_progress').val(this.model.get('passing_progress'));
             this.$el.find('#metadata_description').val(this.model.get('metadata_description'));
+            this.$el.find('#course_mode_label').val(this.model.get('course_mode_label'));
+            this.$el.find('#next_intake_label').val(this.model.get('next_intake_label'));
+            this.$el.find('#certification_label').val(this.model.get('certification_label'));
+            this.$el.find('#academic_value_label').val(this.model.get('academic_value_label'));
 
             this.updateCertificatesDisplayBehavior();
 
@@ -184,6 +188,10 @@ function(ValidatingView, CodeMirror, _, $, ui, DateUtils, FileUploadModel,
             this.$el.find('#' + this.fieldToSelectorMap['course_slug_data']).val(this.model.get('course_slug_data'));
             this.$el.find('#' + this.fieldToSelectorMap['certificate_type']).val(this.model.get('certificate_type'));
             this.$el.find('#' + this.fieldToSelectorMap['passing_progress']).val(this.model.get('passing_progress'));
+            this.$el.find('#' + this.fieldToSelectorMap['course_mode_label']).val(this.model.get('course_mode_label'));
+            this.$el.find('#' + this.fieldToSelectorMap['next_intake_label']).val(this.model.get('next_intake_label'));
+            this.$el.find('#' + this.fieldToSelectorMap['certification_label']).val(this.model.get('certification_label'));
+            this.$el.find('#' + this.fieldToSelectorMap['academic_value_label']).val(this.model.get('academic_value_label'));
             this.$el.find('#' + this.fieldToSelectorMap['metadata_description']).val(this.model.get('metadata_description'));
             if (this.model.get('subscription_enabled') == 'true') {
                this.$('#' + this.fieldToSelectorMap.subscription_enabled).attr('checked', this.model.get('subscription_enabled'));
@@ -233,7 +241,11 @@ function(ValidatingView, CodeMirror, _, $, ui, DateUtils, FileUploadModel,
             certificate_type: 'certificate_type',
             passing_progress: 'passing_progress',
             metadata_description: 'metadata_description',
-            coming_soon_date: 'coming-soon'
+            coming_soon_date: 'coming-soon',
+            course_mode_label: 'course_mode_label',
+            next_intake_label: 'next_intake_label',
+            certification_label: 'certification_label',
+            academic_value_label: 'academic_value_label'
         },
 
         addLearningFields: function() {
@@ -373,6 +385,10 @@ function(ValidatingView, CodeMirror, _, $, ui, DateUtils, FileUploadModel,
             case 'passing_progress':
             case 'metadata_description':
             case 'subscription_enabled':
+            case 'course_mode_label':
+            case 'next_intake_label':
+            case 'certification_label':
+            case 'academic_value_label':
             case 'course-short-description':
                 this.setField(event);
                 break;

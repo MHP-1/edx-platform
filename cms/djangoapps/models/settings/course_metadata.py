@@ -94,6 +94,10 @@ class CourseMetadata:
         'course_slug_data',
         'certificate_type',
         'passing_progress',
+        'course_mode_label',
+        'next_intake_label',
+        'certification_label',
+        'academic_value_label',
     ]
 
     @classmethod

@@ -285,6 +285,10 @@ class CourseOverview(TimeStampedModel):
         course_slug_data = CourseDetails.fetch_about_attribute(course.id, 'course_slug_data')
         certificate_type = CourseDetails.fetch_about_attribute(course.id, 'certificate_type')
         passing_progress = CourseDetails.fetch_about_attribute(course.id, 'passing_progress')
+        course_mode_label = CourseDetails.fetch_about_attribute(course.id, 'course_mode_label')
+        next_intake_label = CourseDetails.fetch_about_attribute(course.id, 'next_intake_label')
+        certification_label = CourseDetails.fetch_about_attribute(course.id, 'certification_label')
+        academic_value_label = CourseDetails.fetch_about_attribute(course.id, 'academic_value_label')
         subscription_enabled = True if subscription_enabled == 'true' else False
         data = {
             'category': category,
@@ -298,7 +302,11 @@ class CourseOverview(TimeStampedModel):
             'display_name': course_slug_data or display_name,
             'coming_soon_date': course.coming_soon_date,
             'certificate_type': certificate_type,
-            'passing_progress': passing_progress
+            'passing_progress': passing_progress,
+            'course_mode_label': course_mode_label,
+            'next_intake_label': next_intake_label,
+            'certification_label': certification_label,
+            'academic_value_label': academic_value_label
         }
         from course_manage.models import CourseManage
         CourseManage.create_or_update(course.id, data)

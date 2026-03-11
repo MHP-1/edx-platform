@@ -1130,6 +1130,31 @@ class CourseFields:  # lint-amnesty, pylint: disable=missing-class-docstring
         scope=Scope.settings
     )
     coming_soon_date = Date(help=_("Course coming soon date"), scope=Scope.settings)
+    course_mode_label = String(
+        display_name=_("Course Mode Label"),
+        help=_("Add Course Mode Label."),
+        default='',
+        scope=Scope.settings
+    )
+    next_intake_label = String(
+        display_name=_("Next Intake Label"),
+        help=_("Add Next Intake Label."),
+        default='',
+        scope=Scope.settings
+    )
+    certification_label = String(
+        display_name=_("Certification Label"),
+        help=_("Add Certification Label."),
+        default='',
+        scope=Scope.settings
+    )
+    academic_value_label = String(
+        display_name=_("Academic Value Label"),
+        help=_("Add Academic Value Label."),
+        default='',
+        scope=Scope.settings
+    )
+
 
 class CourseBlock(
     CourseFields,
