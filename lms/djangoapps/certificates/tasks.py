@@ -199,7 +199,7 @@ def generate_course_cert_pdf(certificate_id):
         "margin-left": "2mm",
         "margin-right": "2mm",
         "page-width": "180mm",
-        "page-height": "131mm",
+        "page-height": "133mm",
         "zoom": 1,
         "load-media-error-handling": "skip",
     }
