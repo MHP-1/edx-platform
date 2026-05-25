@@ -89,6 +89,7 @@ class CourseDetails:
         self.self_paced = None
         self.learning_info = []
         self.instructor_info = []
+        self.accreditation_info = []
         # Added by developer
         self.course_category = ""
         self.subject = ""
@@ -153,6 +154,7 @@ class CourseDetails:
         course_details.self_paced = block.self_paced
         course_details.learning_info = block.learning_info
         course_details.instructor_info = block.instructor_info
+        course_details.accreditation_info = block.accreditation_info
         # Added by developer
         course_details.course_category = block.course_category
         course_details.subject = block.subject
@@ -336,6 +338,10 @@ class CourseDetails:
 
         if 'instructor_info' in jsondict:
             block.instructor_info = jsondict['instructor_info']
+            dirty = True
+
+        if 'accreditation_info' in jsondict:
+            block.accreditation_info = jsondict['accreditation_info']
             dirty = True
 
         if 'language' in jsondict and jsondict['language'] != block.language:

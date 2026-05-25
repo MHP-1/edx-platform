@@ -1023,6 +1023,26 @@ class CourseFields:  # lint-amnesty, pylint: disable=missing-class-docstring
         },
         scope=Scope.settings
     )
+    """
+    accreditation_info dict structure:
+    {
+        "accreditations": [
+            {
+                "name": "",
+                "logo": ""
+            }
+        ]
+    }
+    """
+    accreditation_info = Dict(
+        display_name=_("Course Accreditation"),
+        help=_("Enter the details for Course Accreditation"),
+        default={
+            "accreditations": []
+        },
+        scope=Scope.settings
+    )
+
     allow_unsupported_xblocks = Boolean(
         display_name=_("Add Unsupported Problems and Tools"),
         help=_(

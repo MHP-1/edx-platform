@@ -1,0 +1,25 @@
+<li class="field-group">
+  <div class="field text field-course-accreditation-name">
+    <label for="course-accreditation-name-<%- index %>"><%- gettext("Accrediting Body Name") %></label>
+    <input type="text" class="long" id="course-accreditation-name-<%- index %>" value="<%- data['name'] %>" data-index=<%- index %> data-field="name" placeholder="<%- gettext('Accrediting Body Name') %>" />
+    <span class="tip tip-stacked"><%- gettext("Please add the name of the accrediting body") %></span>
+  </div>
+
+  <div class="field image field-course-accreditation-logo current-accreditation-logo">
+    <label for="course-accreditation-logo-<%- index %>"><%- gettext("Logo") %></label>
+    <span class="wrapper-accreditation-logo">
+      <img id="course-accreditation-logo-preview-<%- index %>" class="accreditation-logo" src="<%- data['logo'] %>" alt="<%- gettext('Accreditation Logo') %>" />
+    </span>
+    <div class="wrapper-input">
+      <div class="input">
+        <input type="text" dir="ltr" class="long new-accreditation-logo-url" id="course-accreditation-logo-<%- index %>" value="<%- data['logo'] %>" data-index="<%- index %>" data-field="logo" placeholder="<%- gettext('Accreditation Logo URL') %>" autocomplete="off" />
+        <span class="tip tip-stacked"><%- gettext("Please add a logo for the accrediting body (Note: only JPEG or PNG format supported)") %></span>
+      </div>
+      <button type="button" class="action action-upload-accreditation-logo" data-index=<%- index %>><%- gettext("Upload Logo") %></button>
+    </div>
+  </div>
+
+  <div class="actions">
+    <button type="button" class="button delete-button standard remove-item remove-accreditation-data" data-index=<%- index %>><%- gettext("Delete") %></button>
+  </div>
+</li>

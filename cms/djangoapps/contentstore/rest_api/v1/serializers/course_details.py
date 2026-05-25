@@ -21,6 +21,17 @@ class InstructorsSerializer(serializers.Serializer):
     instructors = InstructorInfoSerializer(many=True, allow_empty=True, allow_null=True, required=False)
 
 
+class AccreditationInfoSerializer(serializers.Serializer):
+    """ Serializer for a single accreditation entry """
+    name = serializers.CharField(allow_blank=True, required=False)
+    logo = serializers.CharField(allow_blank=True, required=False)
+
+
+class AccreditationsSerializer(serializers.Serializer):
+    """ Serializer for the accreditation_info dict """
+    accreditations = AccreditationInfoSerializer(many=True, allow_empty=True, allow_null=True, required=False)
+
+
 class CourseDetailsSerializer(serializers.Serializer):
     """ Serializer for course details """
     about_sidebar_html = serializers.CharField(allow_null=True, allow_blank=True)
@@ -41,6 +52,7 @@ class CourseDetailsSerializer(serializers.Serializer):
     entrance_exam_id = serializers.CharField(allow_blank=True)
     entrance_exam_minimum_score_pct = serializers.CharField(allow_blank=True)
     instructor_info = InstructorsSerializer()
+    accreditation_info = AccreditationsSerializer()
     intro_video = serializers.CharField(allow_null=True)
     language = serializers.CharField(allow_null=True)
     learning_info = serializers.ListField(child=serializers.CharField(allow_blank=True))

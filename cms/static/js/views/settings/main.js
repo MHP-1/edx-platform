@@ -1,10 +1,11 @@
 define(['js/views/validation', 'codemirror', 'underscore', 'jquery', 'jquery.ui', 'js/utils/date_utils',
     'js/models/uploads', 'js/views/uploads', 'js/views/license', 'js/models/license',
     'common/js/components/views/feedback_notification', 'jquery.timepicker', 'date', 'gettext',
-    'js/views/learning_info', 'js/views/instructor_info', 'edx-ui-toolkit/js/utils/string-utils'],
+    'js/views/learning_info', 'js/views/instructor_info', 'js/views/accreditation_info',
+    'edx-ui-toolkit/js/utils/string-utils'],
 function(ValidatingView, CodeMirror, _, $, ui, DateUtils, FileUploadModel,
     FileUploadDialog, LicenseView, LicenseModel, NotificationView,
-    timepicker, date, gettext, LearningInfoView, InstructorInfoView, StringUtils) {
+    timepicker, date, gettext, LearningInfoView, InstructorInfoView, AccreditationInfoView, StringUtils) {
     var DetailsView = ValidatingView.extend({
     // Model class is CMS.Models.Settings.CourseDetails
         events: {
@@ -23,7 +24,8 @@ function(ValidatingView, CodeMirror, _, $, ui, DateUtils, FileUploadModel,
             'blur :input': 'inputUnfocus',
             'click .action-upload-image': 'uploadImage',
             'click .add-course-learning-info': 'addLearningFields',
-            'click .add-course-instructor-info': 'addInstructorFields'
+            'click .add-course-instructor-info': 'addInstructorFields',
+            'click .add-course-accreditation-info': 'addAccreditationFields'
         },
 
         initialize: function(options) {
@@ -85,6 +87,11 @@ function(ValidatingView, CodeMirror, _, $, ui, DateUtils, FileUploadModel,
 
             this.instructor_info_view = new InstructorInfoView({
                 el: $('.course-instructor-details-fields'),
+                model: this.model
+            });
+
+            this.accreditation_info_view = new AccreditationInfoView({
+                el: $('.course-accreditation-details-fields'),
                 model: this.model
             });
         },
@@ -172,6 +179,7 @@ function(ValidatingView, CodeMirror, _, $, ui, DateUtils, FileUploadModel,
             this.licenseView.render();
             this.learning_info_view.render();
             this.instructor_info_view.render();
+            this.accreditation_info_view.render();
 
             // Added by developer
             this.$el.find('#' + this.fieldToSelectorMap['course_category']).val(this.model.get('course_category'));
@@ -260,6 +268,18 @@ function(ValidatingView, CodeMirror, _, $, ui, DateUtils, FileUploadModel,
             this.model.set('instructor_info', {instructors: instructors});
         },
 
+        addAccreditationFields: function() {
+        /*
+        * Add new course accreditation fields.
+        * */
+            var accreditations = this.model.get('accreditation_info').accreditations.slice(0);
+            accreditations.push({
+                name: '',
+                logo: ''
+            });
+            this.model.set('accreditation_info', {accreditations: accreditations});
+        },
+
         updateTime: function(e) {
             var now = new Date(),
                 hours = now.getUTCHours(),
@@ -301,6 +321,20 @@ function(ValidatingView, CodeMirror, _, $, ui, DateUtils, FileUploadModel,
                 this.model.set('instructor_info', {instructors: instructors});
                 this.showNotificationBar();
                 this.updateImagePreview(event.currentTarget, '#course-instructor-image-preview-' + index);
+                break;
+            case 'course-accreditation-name-' + index:
+                value = $(event.currentTarget).val();
+                var accreditations = this.model.get('accreditation_info').accreditations.slice(0);
+                accreditations[index].name = value;
+                this.model.set('accreditation_info', {accreditations: accreditations});
+                this.showNotificationBar();
+                break;
+            case 'course-accreditation-logo-' + index:
+                accreditations = this.model.get('accreditation_info').accreditations.slice(0);
+                accreditations[index].logo = $(event.currentTarget).val();
+                this.model.set('accreditation_info', {accreditations: accreditations});
+                this.showNotificationBar();
+                this.updateImagePreview(event.currentTarget, '#course-accreditation-logo-preview-' + index);
                 break;
             case 'course-image-url':
                 this.updateImageField(event, 'course_image_name', '#course-image');

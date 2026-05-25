@@ -37,6 +37,7 @@ function(Backbone, _, gettext, ValidationHelpers, DateUtils, StringUtils) {
             entrance_exam_minimum_score_pct: '50',
             learning_info: [],
             instructor_info: {},
+            accreditation_info: {},
             self_paced: null
         },
 
