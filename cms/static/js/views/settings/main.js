@@ -49,6 +49,10 @@ function(ValidatingView, CodeMirror, _, $, ui, DateUtils, FileUploadModel,
             this.$el.find('#certificate_type').val(this.model.get('certificate_type'));
             this.$el.find('#passing_progress').val(this.model.get('passing_progress'));
             this.$el.find('#metadata_description').val(this.model.get('metadata_description'));
+            this.$el.find('#course_duration_text').val(this.model.get('course_duration_text'));
+            this.$el.find('#course_type').val(this.model.get('course_type'));
+            this.$el.find('#sample_lecture_video').val(this.model.get('sample_lecture_video'));
+            this.$el.find('#video_url').val(this.model.get('video_url'));
 
             this.updateCertificatesDisplayBehavior();
 
@@ -193,6 +197,10 @@ function(ValidatingView, CodeMirror, _, $, ui, DateUtils, FileUploadModel,
             this.$el.find('#' + this.fieldToSelectorMap['certificate_type']).val(this.model.get('certificate_type'));
             this.$el.find('#' + this.fieldToSelectorMap['passing_progress']).val(this.model.get('passing_progress'));
             this.$el.find('#' + this.fieldToSelectorMap['metadata_description']).val(this.model.get('metadata_description'));
+            this.$el.find('#' + this.fieldToSelectorMap['course_duration_text']).val(this.model.get('course_duration_text'));
+            this.$el.find('#' + this.fieldToSelectorMap['course_type']).val(this.model.get('course_type'));
+            this.$el.find('#' + this.fieldToSelectorMap['sample_lecture_video']).val(this.model.get('sample_lecture_video'));
+            this.$el.find('#' + this.fieldToSelectorMap['video_url']).val(this.model.get('video_url'));
             if (this.model.get('subscription_enabled') == 'true') {
                this.$('#' + this.fieldToSelectorMap.subscription_enabled).attr('checked', this.model.get('subscription_enabled'));
             } else {
@@ -241,7 +249,11 @@ function(ValidatingView, CodeMirror, _, $, ui, DateUtils, FileUploadModel,
             certificate_type: 'certificate_type',
             passing_progress: 'passing_progress',
             metadata_description: 'metadata_description',
-            coming_soon_date: 'coming-soon'
+            coming_soon_date: 'coming-soon',
+            course_duration_text: 'course_duration_text',
+            course_type: 'course_type',
+            sample_lecture_video: 'sample_lecture_video',
+            video_url: 'video_url'
         },
 
         addLearningFields: function() {
@@ -401,6 +413,10 @@ function(ValidatingView, CodeMirror, _, $, ui, DateUtils, FileUploadModel,
             case 'difficulty':
             case 'duration':
             case 'certificate_duration':
+            case 'course_duration_text':
+            case 'course_type':
+            case 'sample_lecture_video':
+            case 'video_url':
             case 'metadata_title':
             case 'course_slug_data':
             case 'certificate_type':

@@ -1150,6 +1150,30 @@ class CourseFields:  # lint-amnesty, pylint: disable=missing-class-docstring
         scope=Scope.settings
     )
     coming_soon_date = Date(help=_("Course coming soon date"), scope=Scope.settings)
+    course_duration_text = String(
+        display_name=_("Course Duration Text"),
+        help=_("Add Course Duration Text."),
+        default='',
+        scope=Scope.settings
+    )
+    course_type = String(
+        display_name=_("Course Type"),
+        help=_("Add Course Type."),
+        default='',
+        scope=Scope.settings
+    )
+    sample_lecture_video = String(
+        display_name=_("Sample Lecture Video"),
+        help=_("Add Sample Lecture Video."),
+        default='',
+        scope=Scope.settings
+    )
+    video_url = String(
+        display_name=_("Video URL"),
+        help=_("Add Video URL."),
+        default='',
+        scope=Scope.settings
+    )
 
 class CourseBlock(
     CourseFields,

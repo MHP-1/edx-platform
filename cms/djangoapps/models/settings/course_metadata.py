@@ -94,6 +94,10 @@ class CourseMetadata:
         'course_slug_data',
         'certificate_type',
         'passing_progress',
+        'course_duration_text',
+        'course_type',
+        'sample_lecture_video',
+        'video_url',
     ]
 
     @classmethod
