@@ -1074,7 +1074,10 @@ def course_about_with_slug(request, slug_id):
             'reg_then_add_to_cart_link': reg_then_add_to_cart_link
         }
 
-        course_about_template = 'courseware/course_about.html'
+        if str(course.id) in getattr(settings, 'COURSE_DETAILS_PAGE_NEW_DESIGN', []):
+            course_about_template = 'courseware/course_about.html'
+        else:
+            course_about_template = 'courseware/old_course_about.html'
         try:
             # .. filter_implemented_name: CourseAboutRenderStarted
             # .. filter_type: org.openedx.learning.course_about.render.started.v1
