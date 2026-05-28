@@ -295,31 +295,21 @@ def courses(request):
     """
     Render "find courses" page.  The course selection work is done in courseware.courses.
     """
-    courses_list = []
-    course_discovery_meanings = getattr(settings, 'COURSE_DISCOVERY_MEANINGS', {})
-    set_default_filter = ENABLE_COURSE_DISCOVERY_DEFAULT_LANGUAGE_FILTER.is_enabled()
-    if not settings.FEATURES.get('ENABLE_COURSE_DISCOVERY'):
-        courses_list = get_courses(
-            request.user,
-            filter_={"catalog_visibility": CATALOG_VISIBILITY_CATALOG_AND_ABOUT},
-        )
+    courses_list = get_courses(
+        request.user,
+        filter_={"catalog_visibility": CATALOG_VISIBILITY_CATALOG_AND_ABOUT},
+    )
 
-        if configuration_helpers.get_value("ENABLE_COURSE_SORTING_BY_START_DATE",
-                                           settings.FEATURES["ENABLE_COURSE_SORTING_BY_START_DATE"]):
-            courses_list = sort_by_start_date(courses_list)
-        else:
-            courses_list = sort_by_announcement(courses_list)
-
-    # Add marketable programs to the context.
-    programs_list = get_programs_with_type(request.site, include_hidden=False)
+    if configuration_helpers.get_value("ENABLE_COURSE_SORTING_BY_START_DATE",
+                                        settings.FEATURES["ENABLE_COURSE_SORTING_BY_START_DATE"]):
+        courses_list = sort_by_start_date(courses_list)
+    else:
+        courses_list = sort_by_announcement(courses_list)
 
     return render_to_response(
         "courseware/courses.html",
         {
             'courses': courses_list,
-            'course_discovery_meanings': course_discovery_meanings,
-            'set_default_filter': set_default_filter,
-            'programs_list': programs_list,
         }
     )
 
@@ -1031,7 +1021,7 @@ def course_about_with_slug(request, slug_id):
         sidebar_html_enabled = ENABLE_COURSE_ABOUT_SIDEBAR_HTML.is_enabled()
 
         allow_anonymous = check_public_access(course, [COURSE_VISIBILITY_PUBLIC, COURSE_VISIBILITY_PUBLIC_OUTLINE])
-        currency, price, strike_price = CourseMode.get_course_price_and_currency(course.id, request.session.get('country_code', "IN"))
+        currency, price, strike_price = CourseMode.get_course_price_and_currency(course.id)
         if in_cart and cart.currency != currency:
             cart.delete()
             in_cart = False
@@ -1069,6 +1059,7 @@ def course_about_with_slug(request, slug_id):
             'overview': overview,
             'currency': currency,
             'price': price,
+            'strike_price': strike_price,
             'can_add_course_to_cart': can_add_course_to_cart,
             'cart_link': reverse('shoppingcart:shoppingcart.views.show_cart'),
             'reg_then_add_to_cart_link': reg_then_add_to_cart_link
