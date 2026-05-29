@@ -87,7 +87,7 @@ from common.djangoapps.util.db import outer_atomic
 from common.djangoapps.util.json_request import JsonResponse
 from common.djangoapps.student.signals import USER_EMAIL_CHANGED
 from xmodule.modulestore.django import modulestore  # lint-amnesty, pylint: disable=wrong-import-order
-
+from xmodule.course_block import CATALOG_VISIBILITY_CATALOG_AND_ABOUT
 log = logging.getLogger("edx.student")
 
 AUDIT_LOG = logging.getLogger("audit")
@@ -133,8 +133,10 @@ def index(request, extra_context=None, user=AnonymousUser()):
     if extra_context is None:
         extra_context = {}
 
-    courses = get_courses(user)
-
+    courses = get_courses(
+        request.user,
+        filter_={"catalog_visibility": CATALOG_VISIBILITY_CATALOG_AND_ABOUT},
+    )
     if configuration_helpers.get_value(
         "ENABLE_COURSE_SORTING_BY_START_DATE",
         settings.FEATURES["ENABLE_COURSE_SORTING_BY_START_DATE"],
