@@ -8,9 +8,9 @@ from urllib.parse import parse_qs, urlsplit, urlunsplit  # pylint: disable=impor
 import nh3
 from django.conf import settings
 from django.contrib.auth import logout
-from django.shortcuts import redirect
 from django.utils.http import urlencode
-from django.views.generic import TemplateView
+from django.shortcuts import redirect  # Import redirect for HTTP redirect
+from django.views.generic import View  # Use View instead of TemplateView since we are now redirecting
 from oauth2_provider.models import Application
 
 from openedx.core.djangoapps.safe_sessions.middleware import mark_user_change_as_expected
@@ -19,12 +19,12 @@ from openedx.core.djangoapps.user_authn.utils import is_safe_login_or_logout_red
 from common.djangoapps.third_party_auth import pipeline as tpa_pipeline
 
 
-class LogoutView(TemplateView):
+class LogoutView(View):
     """
     Logs out user and redirects.
 
-    The template should load iframes to log the user out of OpenID Connect services.
-    See http://openid.net/specs/openid-connect-logout-1_0.html.
+    Immediately logs out user and redirects to home page ("/").
+    No logout.html is rendered.
     """
     oauth_client_ids = []
     template_name = 'logout.html'
@@ -44,21 +44,15 @@ class LogoutView(TemplateView):
     @property
     def target(self):
         """
-        If a redirect_url is specified in the querystring for this request, and the value is a safe
-        url for redirect, the view will redirect to this page after rendering the template.
-        If it is not specified, we will use the default target url.
+        Resolve the redirect target after logout. Falls back to root ("/").
+        If TPA_AUTOMATIC_LOGOUT_ENABLED is set, and tpa_logout_url is configured, redirects there.
+        Otherwise uses a safe provided redirect_url or next param.
         """
+        if getattr(settings, 'TPA_AUTOMATIC_LOGOUT_ENABLED', False) and self.tpa_logout_url:
+            return self.tpa_logout_url
+
         target_url = self.request.GET.get('redirect_url') or self.request.GET.get('next')
 
-        #  Some third party apps do not build URLs correctly and send next query param without URL-encoding, resulting
-        #  all plus('+') signs interpreted as space(' ') in the process of URL-decoding
-        #  for example if we hit on:
-        #  >> http://example.com/logout?next=/courses/course-v1:ARTS+D1+2018_T/course/
-        #  we will receive in request.GET['next']
-        #  >> /courses/course-v1:ARTS D1 2018_T/course/
-        #  instead of
-        #  >> /courses/course-v1:ARTS+D1+2018_T/course/
-        #  to handle this scenario we need to encode our URL using quote_plus and then unquote it again.
         if target_url:
             target_url = nh3.clean(parse.unquote(parse.quote_plus(target_url)))
 
@@ -73,27 +67,19 @@ class LogoutView(TemplateView):
     def dispatch(self, request, *args, **kwargs):
         # We do not log here, because we have a handler registered to perform logging on successful logouts.
 
-        # Get third party auth provider's logout url
+        # Get third party auth provider's logout url, if necessary
         self.tpa_logout_url = tpa_pipeline.get_idp_logout_url_from_running_pipeline(request)
 
+        # Perform the actual logout
         logout(request)
 
-        response = super().dispatch(request, *args, **kwargs)
+        # Prepare to redirect
+        response = redirect(self.target)
 
         # Clear the cookie used by the edx.org marketing site
         delete_logged_in_cookies(response)
 
         mark_user_change_as_expected(None)
-
-        # Redirect to tpa_logout_url if TPA_AUTOMATIC_LOGOUT_ENABLED is set to True and if
-        # tpa_logout_url is configured.
-        #
-        # NOTE: This step skips rendering logout.html, which is used to log the user out from the
-        # different IDAs. To ensure the user is logged out of all the IDAs be sure to redirect
-        # back to <LMS>/logout after logging out of the TPA.
-        if getattr(settings, 'TPA_AUTOMATIC_LOGOUT_ENABLED', False):
-            if self.tpa_logout_url:
-                return redirect(self.tpa_logout_url)
 
         return response
 
