@@ -147,7 +147,7 @@ from openedx.features.course_experience.url_helpers import (
 from openedx.features.course_experience.utils import dates_banner_should_display
 from openedx.features.course_experience.waffle import ENABLE_COURSE_ABOUT_SIDEBAR_HTML
 from openedx.features.enterprise_support.api import data_sharing_consent_required
-from course_manage.models import CourseManage
+from course_manage.models import CourseManage, EnableNewUIForCourse
 from shoppingcart.utils import is_shopping_cart_enabled
 from shoppingcart.models import Order, PaidCourseRegistration, CourseRegCodeItem
 from subscription.models import UserSubscription
@@ -1074,7 +1074,7 @@ def course_about_with_slug(request, slug_id):
             'reg_then_add_to_cart_link': reg_then_add_to_cart_link
         }
 
-        if str(course.id) in getattr(settings, 'COURSE_DETAILS_PAGE_NEW_DESIGN', []):
+        if EnableNewUIForCourse.objects.filter(course_id=course.id).exists():
             course_about_template = 'courseware/course_about.html'
         else:
             course_about_template = 'courseware/old_course_about.html'
