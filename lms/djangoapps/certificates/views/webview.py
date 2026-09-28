@@ -368,6 +368,7 @@ def _update_context_with_user_info(request, context, user, user_certificate):
 
     context["accomplishment_course_type"] = course_manage.difficulty.name
     context["credits_text"] = course_manage.credits
+    context["course_duration_text"] = course_manage.course_duration_text
     course_type_text = CourseManage.get_course_type(context.get("course_id"))
     context["accomplishment_course_type_text"] = (
         course_type_text if course_type_text else "Configure Course Type"
