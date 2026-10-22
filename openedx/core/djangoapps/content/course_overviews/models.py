@@ -268,6 +268,10 @@ class CourseOverview(TimeStampedModel):
         # it to be a float like everything else.
         if isinstance(course.entrance_exam_minimum_score_pct, int):
             course_overview.entrance_exam_minimum_score_pct = course.entrance_exam_minimum_score_pct / 100
+        elif course.entrance_exam_minimum_score_pct is None:
+            course_overview.entrance_exam_minimum_score_pct = cls._meta.get_field(
+                'entrance_exam_minimum_score_pct'
+            ).get_default()
         else:
             course_overview.entrance_exam_minimum_score_pct = course.entrance_exam_minimum_score_pct
 
